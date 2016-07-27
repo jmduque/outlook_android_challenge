@@ -17,4 +17,19 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="oaec_agenda_header">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingBottom">@dimen/oaec_small_spacing</item>
+        <item name="android:paddingLeft">@dimen/oaec_xlarge_spacing</item>
+        <item name="android:paddingRight">@dimen/oaec_xlarge_spacing</item>
+        <item name="android:paddingTop">@dimen/oaec_small_spacing</item>
+    </style>
+
+    <style name="oaec_agenda_cell">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/oaec_xlarge_spacing</item>
+    </style>
+
 </resources>

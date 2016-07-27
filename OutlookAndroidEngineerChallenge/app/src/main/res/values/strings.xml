@@ -7,4 +7,7 @@
     <!-- Main Activity Menus -->
     <string name="oaec_action_set_view">Set View</string>
     <string name="oaec_action_settings">Settings</string>
+
+    <!-- Agenda View -->
+    <string name="oaec_agenda_no_event">No Event</string>
 </resources>
