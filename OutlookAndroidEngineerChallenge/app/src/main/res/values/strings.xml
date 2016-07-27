@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">OutlookAndroidEngineerChallenge</string>
-    <string name="action_settings">Settings</string>
+
+    <!-- Main Activity -->
+    <string name="oaec_main_title">Main</string>
+
+    <!-- Main Activity Menus -->
+    <string name="oaec_action_set_view">Set View</string>
+    <string name="oaec_action_settings">Settings</string>
 </resources>
