@@ -3,7 +3,6 @@ package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -13,8 +12,10 @@ import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.Agend
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaHeader;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaItem;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaNoEvent;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaEventViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaHeaderViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaItemViewHolder;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaNoEventViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 
 /**
@@ -44,6 +45,17 @@ public class AgendaAdapter
         this.items = items;
 
         layoutInflater = LayoutInflater.from(context);
+    }
+
+    public AgendaItem getItem(int position) {
+        if (!CollectionUtils.isValidPosition(
+                items,
+                position
+        )) {
+            return null;
+        }
+
+        return items.get(position);
     }
 
     @Override
@@ -78,15 +90,7 @@ public class AgendaAdapter
             ViewGroup parent,
             int viewType
     ) {
-        return null;
-    }
-
-    @Override
-    public void onBindViewHolder(
-            AgendaItemViewHolder holder,
-            int position
-    ) {
-        switch (getItemViewType(position)) {
+        switch (viewType) {
             case HEADER: {
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
@@ -96,22 +100,22 @@ public class AgendaAdapter
                 );
             }
             case NO_EVENT: {
-                return new AgendaHeaderViewHolder(
+                return new AgendaNoEventViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_agenda_day,
+                                R.layout.item_agenda_no_event,
                                 null
                         )
                 );
             }
             case EVENT: {
-                return new AgendaHeaderViewHolder(
+                return new AgendaEventViewHolder(
                         layoutInflater.inflate(
                                 R.layout.item_agenda_day,
                                 null
                         )
                 );
             }
-            default:{
+            default: {
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
                                 R.layout.item_agenda_day,
@@ -120,6 +124,17 @@ public class AgendaAdapter
                 );
             }
         }
+    }
+
+    @Override
+    public void onBindViewHolder(
+            AgendaItemViewHolder holder,
+            int position
+    ) {
+        holder.setModel(
+                getItem(position)
+        );
+        holder.updateView();
     }
 
     @Override

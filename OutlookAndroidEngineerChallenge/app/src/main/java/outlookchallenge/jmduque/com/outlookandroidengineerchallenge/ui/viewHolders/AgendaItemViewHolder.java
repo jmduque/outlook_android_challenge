@@ -51,7 +51,7 @@ public abstract class AgendaItemViewHolder<T extends AgendaItem>
     }
 
     @Override
-    protected void updateView() {
+    public void updateView() {
         if (item == null) {
             setNameText(null);
             setDateText(null);

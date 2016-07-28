@@ -42,7 +42,7 @@ public class AgendaEventViewHolder
     }
 
     @Override
-    protected void updateView() {
+    public void updateView() {
         super.updateView();
         if (item == null) {
             setDurationText(

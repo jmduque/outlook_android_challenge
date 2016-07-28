@@ -30,7 +30,7 @@ public class AgendaNoEventViewHolder
     }
 
     @Override
-    protected void updateView() {
+    public void updateView() {
         super.updateView();
         //NO DATA TO UPDATE, ALL EMPTY EVENTS HAVE SAME PRE-POPULATED DEFAULT TEXT
     }
