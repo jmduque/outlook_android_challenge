@@ -1,12 +1,15 @@
 package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 
 import java.util.Date;
 
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaHeader;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
 
 /**
  * Created by Jose on 7/28/2016.
@@ -100,8 +103,31 @@ public class AgendaHeaderViewHolder
             @Nullable Date date,
             @NonNull Date today
     ) {
-        //TODO
-        return null;
+        Context context = itemView.getContext();
+        if (DateTimeUtils.isSameDay(
+                today,
+                date
+        )) {
+            return context.getString(
+                    R.string.oaec_agenda_today_date,
+                    DateTimeUtils.dayOfTheMonthWithWeekday.format(date)
+            );
+        } else if (DateTimeUtils.isNextDay(
+                today,
+                date
+        )) {
+            return context.getString(
+                    R.string.oaec_agenda_tomorrow_date,
+                    DateTimeUtils.dayOfTheMonthWithWeekday.format(date)
+            );
+        } else if (DateTimeUtils.isSameYear(
+                today,
+                date
+        )) {
+            return DateTimeUtils.dayOfTheMonthWithWeekday.format(date);
+        } else {
+            return DateTimeUtils.dayOfTheYearWithWeekday.format(date);
+        }
     }
 
     /**
@@ -114,7 +140,6 @@ public class AgendaHeaderViewHolder
             @Nullable Date date,
             @NonNull Date today
     ) {
-        //TODO
         return null;
     }
 

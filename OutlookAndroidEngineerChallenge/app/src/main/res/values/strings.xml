@@ -16,4 +16,6 @@
     <string name="oaec_agenda_event_date_all_day">All day</string>
     <string name="oaec_agenda_event_duration_all_day">1d</string>
     <string name="oaec_agenda_event_duration">%1$dh</string>
+    <string name="oaec_agenda_today_date">Today - %1$s</string>
+    <string name="oaec_agenda_tomorrow_date">Tomorrow - %1$s</string>
 </resources>
