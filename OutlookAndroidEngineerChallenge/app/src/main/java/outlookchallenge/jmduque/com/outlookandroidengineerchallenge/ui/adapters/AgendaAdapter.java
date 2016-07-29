@@ -94,7 +94,7 @@ public class AgendaAdapter
             case HEADER: {
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_agenda_day,
+                                R.layout.item_agenda_header,
                                 null
                         )
                 );
@@ -110,7 +110,7 @@ public class AgendaAdapter
             case EVENT: {
                 return new AgendaEventViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_agenda_day,
+                                R.layout.item_agenda_header,
                                 null
                         )
                 );
@@ -118,7 +118,7 @@ public class AgendaAdapter
             default: {
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_agenda_day,
+                                R.layout.item_agenda_header,
                                 null
                         )
                 );

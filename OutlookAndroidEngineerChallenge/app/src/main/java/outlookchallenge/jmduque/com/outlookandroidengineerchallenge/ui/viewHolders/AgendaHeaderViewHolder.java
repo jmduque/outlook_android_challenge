@@ -64,22 +64,27 @@ public class AgendaHeaderViewHolder
             @Nullable Date date,
             @NonNull AgendaHeader.AgendaHeaderType type
     ) {
+        Date today = new Date();
         switch (type) {
             case day:
                 return getDayDateText(
-                        date
+                        date,
+                        today
                 );
             case week:
                 return getWeeklyDateText(
-                        date
+                        date,
+                        today
                 );
             case month:
                 return getMonthlyDateText(
-                        date
+                        date,
+                        today
                 );
             case year:
                 return getYearlyDateText(
-                        date
+                        date,
+                        today
                 );
         }
         return null;
@@ -92,7 +97,8 @@ public class AgendaHeaderViewHolder
      * <b>Other days:</b> $WEEKDAY, $MONTH $DAY_OF_THE_MONTH $YEAR
      */
     protected String getDayDateText(
-            @Nullable Date date
+            @Nullable Date date,
+            @NonNull Date today
     ) {
         //TODO
         return null;
@@ -105,7 +111,8 @@ public class AgendaHeaderViewHolder
      * <b>Other Weeks:</b> WEEK $WEEK_OF_THE_MONTH, $MONTH $YEAR
      */
     protected String getWeeklyDateText(
-            @Nullable Date date
+            @Nullable Date date,
+            @NonNull Date today
     ) {
         //TODO
         return null;
@@ -118,7 +125,8 @@ public class AgendaHeaderViewHolder
      * <b>Other months:</b> $MONTH $YEAR
      */
     protected String getMonthlyDateText(
-            @Nullable Date date
+            @Nullable Date date,
+            @NonNull Date today
     ) {
         //TODO
         return null;
@@ -130,7 +138,8 @@ public class AgendaHeaderViewHolder
      * <b>Other years:</b> $YEAR
      */
     protected String getYearlyDateText(
-            @Nullable Date date
+            @Nullable Date date,
+            @NonNull Date today
     ) {
         //TODO
         return null;
