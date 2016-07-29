@@ -7,6 +7,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaEvent;
@@ -30,6 +31,7 @@ public class AgendaEventViewHolder
 
     @Override
     public void bindViews(View itemView) {
+        timeOfTheDayGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
         super.bindViews(this.itemView);
         date = (TextView) itemView.findViewById(R.id.date);
         duration = (TextView) itemView.findViewById(R.id.duration);
@@ -77,7 +79,12 @@ public class AgendaEventViewHolder
     }
 
     private static final SimpleDateFormat timeOfTheDay = new SimpleDateFormat(
-            "hh:mm a",
+            "HH:mm",
+            Locale.getDefault()
+    );
+
+    private static final SimpleDateFormat timeOfTheDayGMT = new SimpleDateFormat(
+            "H'h'mm'm'",
             Locale.getDefault()
     );
 
@@ -90,8 +97,8 @@ public class AgendaEventViewHolder
         }
 
         if (date == null) {
-            //IF NO DATE AVAILABLE, WE JUST DISPLAY THE DEFAULT DATE
-            this.date.setText(R.string.oaec_agenda_event_default_date);
+            //IF NO DATE AVAILABLE, WE ASSUME ALL DAY EVENT
+            this.date.setText(R.string.oaec_agenda_event_duration_all_day);
         } else if (endTime == null) {
             //ALL DAY EVENT
             this.date.setText(
@@ -142,7 +149,9 @@ public class AgendaEventViewHolder
         //OTHERWISE, CALCULATE TIME DIFFERENCE
         long timeLapse = endDate.getTime() - date.getTime();
         Date timeLapseDate = new Date(timeLapse);
-        return timeOfTheDay.format(timeLapseDate);
+        return timeOfTheDayGMT.format(
+                timeLapseDate
+        );
     }
 
     private void setLocationText(String value) {

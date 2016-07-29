@@ -5,9 +5,20 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <!-- Spacings -->
+    <dimen name="oaec_xsmall_spacing">2dp</dimen>
     <dimen name="oaec_small_spacing">4dp</dimen>
     <dimen name="oaec_medium_spacing">8dp</dimen>
     <dimen name="oaec_large_spacing">12dp</dimen>
     <dimen name="oaec_xlarge_spacing">16dp</dimen>
+
+    <!-- Elevations -->
+    <dimen name="oaec_tiny_elevation">1dp</dimen>
+    <dimen name="oaec_small_elevation">2dp</dimen>
+    <dimen name="oaec_normal_elevation">4dp</dimen>
+
+    <!-- Text Sizes -->
+    <dimen name="oaec_primary_text_size">16sp</dimen>
+    <dimen name="oaec_secondary_text_size">14sp</dimen>
+    <dimen name="oaec_tertiary_text_size">12sp</dimen>
 
 </resources>

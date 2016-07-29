@@ -4,5 +4,8 @@
     <color name="colorPrimaryDark">#0063AD</color>
     <color name="colorAccent">#0072C6</color>
 
+    //AGENDA VIEW
     <color name="agenda_icon">#B1355F</color>
+    <color name="agenda_header_today_background">#F4F9FD</color>
+    <color name="agenda_header_other_day_background">@android:color/white</color>
 </resources>

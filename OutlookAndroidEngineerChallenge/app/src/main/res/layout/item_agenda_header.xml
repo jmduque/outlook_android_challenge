@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:toos="http://schemas.android.com/tools"
-    style="@style/oaec_agenda_header"
-    android:orientation="vertical">
+    style="@style/oaec_agenda_cell">
 
     <TextView
         android:id="@+id/name"
@@ -10,7 +9,8 @@
         android:layout_height="wrap_content"
         android:maxLines="1"
         android:textAllCaps="true"
-        android:textAppearance="?android:textAppearanceMedium"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="@dimen/oaec_secondary_text_size"
         toos:text="Saturday, August 14" />
 
-</LinearLayout>
+</FrameLayout>

@@ -1,8 +1,10 @@
 package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.format.DateUtils;
 import android.view.View;
 
 import java.util.Date;
@@ -48,6 +50,23 @@ public class AgendaHeaderViewHolder
     protected void setDateText(Date date) {
         if (name == null) {
             return;
+        }
+
+        Resources res = name.getResources();
+        if (DateUtils.isToday(date.getTime())) {
+            itemView.setBackgroundResource(
+                    R.color.agenda_header_today_background
+            );
+            name.setTextColor(
+                    res.getColor(R.color.colorAccent)
+            );
+        } else {
+            itemView.setBackgroundResource(
+                    R.color.agenda_header_other_day_background
+            );
+            name.setTextColor(
+                    res.getColor(android.R.color.secondary_text_light)
+            );
         }
 
         name.setText(
