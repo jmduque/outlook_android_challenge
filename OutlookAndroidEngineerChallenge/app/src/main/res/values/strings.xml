@@ -7,4 +7,15 @@
     <!-- Main Activity Menus -->
     <string name="oaec_action_set_view">Set View</string>
     <string name="oaec_action_settings">Settings</string>
+
+    <!-- Agenda View -->
+    <string name="oaec_agenda_no_event">No Event</string>
+
+    <!-- Agenda Event ViewHolder -->
+    <string name="oaec_agenda_event_default_date">00:00</string>
+    <string name="oaec_agenda_event_date_all_day">All day</string>
+    <string name="oaec_agenda_event_duration_all_day">1d</string>
+    <string name="oaec_agenda_event_duration">%1$dh</string>
+    <string name="oaec_agenda_today_date">Today - %1$s</string>
+    <string name="oaec_agenda_tomorrow_date">Tomorrow - %1$s</string>
 </resources>

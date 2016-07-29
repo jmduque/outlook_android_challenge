@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/oaec_agenda_cell">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"
+        android:text="@string/oaec_agenda_no_event"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="@dimen/oaec_tertiary_text_size"/>
+
+</FrameLayout>

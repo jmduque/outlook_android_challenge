@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/oaec_agenda_cell">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/oaec_secondary_text_size"
+                tools:text="18:00" />
+
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textSize="@dimen/oaec_tertiary_text_size"
+                tools:text="1h" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginLeft="@dimen/oaec_large_spacing"
+            android:layout_marginStart="@dimen/oaec_large_spacing"
+            android:layout_marginTop="@dimen/oaec_small_spacing"
+            android:background="@drawable/ic_agenda_event_icon" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/oaec_large_spacing"
+            android:layout_marginStart="@dimen/oaec_large_spacing"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="@dimen/oaec_primary_text_size"
+                tools:text="Team Dinner" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/oaec_small_spacing"
+                android:drawableLeft="@drawable/ic_place_secondary_color_12dp"
+                android:drawableStart="@drawable/ic_place_secondary_color_12dp"
+                android:gravity="center_vertical"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textSize="@dimen/oaec_tertiary_text_size"
+                tools:text="Luna Cabana" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
