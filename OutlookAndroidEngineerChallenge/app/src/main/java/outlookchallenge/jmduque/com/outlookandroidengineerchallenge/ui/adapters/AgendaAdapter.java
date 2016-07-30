@@ -95,8 +95,7 @@ public class AgendaAdapter
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
                                 R.layout.item_agenda_header,
-                                parent,
-                                false
+                                null
                         )
                 );
             }
@@ -121,8 +120,7 @@ public class AgendaAdapter
             default: {
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_agenda_header,
-                                parent,
+                                R.layout.item_agenda_header,parent,
                                 false
                         )
                 );

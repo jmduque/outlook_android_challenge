@@ -261,19 +261,6 @@ public class MainActivity
      * Setups the listeners for the views within the activity
      */
     private void setListeners() {
-        agenda.setOnScrollListener(
-                new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrolled(
-                            RecyclerView recyclerView,
-                            int dx,
-                            int dy
-                    ) {
-                        super.onScrolled(recyclerView, dx, dy);
-                        agendaLinearLayoutManager.get
-                    }
-                }
-        );
         fab.setOnClickListener(this);
     }
 
