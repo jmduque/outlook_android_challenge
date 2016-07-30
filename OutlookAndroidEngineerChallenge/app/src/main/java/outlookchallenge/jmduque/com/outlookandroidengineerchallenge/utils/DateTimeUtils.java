@@ -18,8 +18,18 @@ public class DateTimeUtils {
             Locale.getDefault()
     );
 
+    public static final SimpleDateFormat monthOfTheYear = new SimpleDateFormat(
+            "yyyy-MM",
+            Locale.getDefault()
+    );
+
     public static final SimpleDateFormat year = new SimpleDateFormat(
             "yyyy",
+            Locale.getDefault()
+    );
+
+    public static final SimpleDateFormat dayOfTheMonth = new SimpleDateFormat(
+            "dd",
             Locale.getDefault()
     );
 
@@ -33,6 +43,11 @@ public class DateTimeUtils {
             Locale.getDefault()
     );
 
+    /**
+     * @param referenceDate  base Date to compare
+     * @param comparableDate item to be compared with the referenceDate
+     * @return true if comparableDate and referenceDate are within same day
+     */
     public static boolean isSameDay(
             Date referenceDate,
             Date comparableDate
@@ -45,6 +60,11 @@ public class DateTimeUtils {
             return false;
         }
 
+        if (Math.abs(referenceDate.getTime() - comparableDate.getTime())
+                > DateUtils.DAY_IN_MILLIS) {
+            return false;
+        }
+
         synchronized (dayOfTheYear) {
             return TextUtils.equals(
                     dayOfTheYear.format(referenceDate),
@@ -53,6 +73,11 @@ public class DateTimeUtils {
         }
     }
 
+    /**
+     * @param referenceDate  base Date to compare
+     * @param comparableDate item to be compared with the referenceDate
+     * @return true if comparableDate is the day after referenceDate
+     */
     public static boolean isNextDay(
             Date referenceDate,
             Date comparableDate
@@ -77,6 +102,37 @@ public class DateTimeUtils {
         }
     }
 
+    /**
+     * @param referenceDate  base Date to compare
+     * @param comparableDate item to be compared with the referenceDate
+     * @return true comparableDate and referenceDate are within same month
+     */
+    public static boolean isSameMonth(
+            Date referenceDate,
+            Date comparableDate
+    ) {
+        if (referenceDate == null) {
+            return false;
+        }
+
+        if (comparableDate == null) {
+            return false;
+        }
+
+        synchronized (monthOfTheYear) {
+            return TextUtils.equals(
+                    monthOfTheYear.format(referenceDate),
+                    monthOfTheYear.format(comparableDate)
+            );
+        }
+    }
+
+
+    /**
+     * @param referenceDate  base Date to compare
+     * @param comparableDate item to be compared with the referenceDate
+     * @return true if comparableDate and referenceDate are within the same year
+     */
     public static boolean isSameYear(
             Date referenceDate,
             Date comparableDate
