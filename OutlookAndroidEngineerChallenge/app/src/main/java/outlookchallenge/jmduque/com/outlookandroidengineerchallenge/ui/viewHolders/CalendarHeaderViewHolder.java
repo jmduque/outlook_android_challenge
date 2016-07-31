@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 
 /**
  * Created by Jose on 7/30/2016.
@@ -61,8 +62,8 @@ public class CalendarHeaderViewHolder
         }
 
         Resources res = day.getResources();
-        if (weekDay == 0
-                || weekDay == 6) {
+        if (weekDay == CalendarDay.SUNDAY
+                || weekDay == CalendarDay.SATURDAY) {
             day.setTextColor(
                     res.getColor(
                             android.R.color.tertiary_text_light
@@ -86,25 +87,25 @@ public class CalendarHeaderViewHolder
     protected String getWeekDayText(int weekDay) {
         Resources res = itemView.getResources();
         switch (weekDay) {
-            case 0: {
+            case CalendarDay.SUNDAY: {
                 return res.getString(R.string.oaec_calendar_sunday);
             }
-            case 1: {
+            case CalendarDay.MONDAY: {
                 return res.getString(R.string.oaec_calendar_monday);
             }
-            case 2: {
+            case CalendarDay.TUESDAY: {
                 return res.getString(R.string.oaec_calendar_tuesday);
             }
-            case 3: {
+            case CalendarDay.WEDNESDAY: {
                 return res.getString(R.string.oaec_calendar_wednesday);
             }
-            case 4: {
+            case CalendarDay.THURSDAY: {
                 return res.getString(R.string.oaec_calendar_thursday);
             }
-            case 5: {
+            case CalendarDay.FRIDAY: {
                 return res.getString(R.string.oaec_calendar_friday);
             }
-            case 6: {
+            case CalendarDay.SATURDAY: {
                 return res.getString(R.string.oaec_calendar_saturday);
             }
         }
