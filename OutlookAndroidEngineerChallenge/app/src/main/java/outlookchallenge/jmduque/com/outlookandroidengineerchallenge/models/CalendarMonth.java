@@ -13,8 +13,8 @@ public class CalendarMonth
 
     private int year;
     private int month; //0 Based;
-    private int selectedDay;
     private Date firstDayOfTheMonth;
+    private int firstWeekDayOfTheMonth;
     private Date lastDayOfTheMonth;
     private List<CalendarDay> days;
 
@@ -37,20 +37,20 @@ public class CalendarMonth
         this.month = month;
     }
 
-    public int getSelectedDay() {
-        return selectedDay;
-    }
-
-    public void setSelectedDay(int selectedDay) {
-        this.selectedDay = selectedDay;
-    }
-
     public Date getFirstDayOfTheMonth() {
         return firstDayOfTheMonth;
     }
 
     public void setFirstDayOfTheMonth(Date firstDayOfTheMonth) {
         this.firstDayOfTheMonth = firstDayOfTheMonth;
+    }
+
+    public int getFirstWeekDayOfTheMonth() {
+        return firstWeekDayOfTheMonth;
+    }
+
+    public void setFirstWeekDayOfTheMonth(int firstWeekDayOfTheMonth) {
+        this.firstWeekDayOfTheMonth = firstWeekDayOfTheMonth;
     }
 
     public Date getLastDayOfTheMonth() {

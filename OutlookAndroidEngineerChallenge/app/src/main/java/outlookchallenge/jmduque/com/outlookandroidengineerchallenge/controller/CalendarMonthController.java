@@ -36,7 +36,7 @@ public class CalendarMonthController {
         Date lastDayOfMonth = calendarMonth.getLastDayOfTheMonth();
 
         gregorianCalendar.setTime(firstDayOfMonth);
-        int firstWeekDayOfTheMonth = gregorianCalendar.getFirstDayOfWeek();
+        int firstWeekDayOfTheMonth = calendarMonth.getFirstWeekDayOfTheMonth();
 
         //We visualize calendar within 6 weeks rows and we fill the gaps accordingly
         for (int i = 0; i < DAYS_IN_A_WEEK * 6; i++) {

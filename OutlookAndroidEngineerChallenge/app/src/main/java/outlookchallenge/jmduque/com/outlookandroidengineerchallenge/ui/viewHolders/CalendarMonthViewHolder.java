@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.CalendarMonthAdapter;
 
@@ -15,7 +16,7 @@ public class CalendarMonthViewHolder
         extends
         BaseViewHolder {
 
-    private CalendarDayViewHolder.DaySelector daySelector;
+    private CalendarDay.DaySelector daySelector;
 
     private RecyclerView month;
     private CalendarMonthAdapter monthAdapter;
@@ -25,7 +26,7 @@ public class CalendarMonthViewHolder
 
     public CalendarMonthViewHolder(
             View itemView,
-            CalendarDayViewHolder.DaySelector daySelector
+            CalendarDay.DaySelector daySelector
     ) {
         super(itemView);
         this.daySelector = daySelector;

@@ -32,14 +32,14 @@ public class CalendarMonthAdapter
     private Context context;
     private LayoutInflater layoutInflater;
 
-    private CalendarDayViewHolder.DaySelector daySelector;
+    private CalendarDay.DaySelector daySelector;
     private List<CalendarDay> items;
 
     private final Calendar calendar = new GregorianCalendar();
 
     public CalendarMonthAdapter(
             Context context,
-            CalendarDayViewHolder.DaySelector daySelector
+            CalendarDay.DaySelector daySelector
     ) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(this.context);

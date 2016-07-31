@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
-import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.CalendarDayViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.CalendarMonthViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 
@@ -23,12 +23,12 @@ public class CalendarAdapter
 
     private Context context;
     private LayoutInflater layoutInflater;
-    private CalendarDayViewHolder.DaySelector daySelector;
+    private CalendarDay.DaySelector daySelector;
     private final List<CalendarMonth> items;
 
     public CalendarAdapter(
             Context context,
-            CalendarDayViewHolder.DaySelector daySelector,
+            CalendarDay.DaySelector daySelector,
             List<CalendarMonth> items
     ) {
         this.context = context;

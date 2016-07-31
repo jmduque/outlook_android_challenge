@@ -4,8 +4,6 @@ import android.content.res.Resources;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.Date;
-
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 
@@ -19,15 +17,7 @@ public class CalendarDayViewHolder
         implements
         View.OnClickListener {
 
-    public interface DaySelector {
-
-        boolean isHighlightedDate(Date date);
-
-        void onDayPressed(Date date);
-
-    }
-
-    private DaySelector daySelector;
+    private CalendarDay.DaySelector daySelector;
 
     private TextView day;
     private CalendarDay calendarDay;
@@ -35,7 +25,7 @@ public class CalendarDayViewHolder
 
     public CalendarDayViewHolder(
             View itemView,
-            DaySelector daySelector
+            CalendarDay.DaySelector daySelector
     ) {
         super(
                 itemView
@@ -72,7 +62,7 @@ public class CalendarDayViewHolder
             );
         }
 
-        updateHighlight(calendarDay.getDate());
+        updateHighlight();
         lastUpdateDayValue = day;
     }
 
@@ -102,37 +92,28 @@ public class CalendarDayViewHolder
         );
     }
 
-    private void updateHighlight(Date dayValue) {
+    private void updateHighlight() {
         Resources res = itemView.getResources();
-        if (itemView.isEnabled()) {
-            boolean isHighlighted = isHighlighted(dayValue);
-            itemView.setSelected(isHighlighted);
-            if (isHighlighted) {
-                day.setTextColor(
-                        res.getColor(android.R.color.primary_text_dark)
-                );
-            } else {
-                day.setTextColor(
-                        res.getColor(android.R.color.primary_text_light)
-                );
-            }
-        } else {
+        boolean isOverflow = calendarDay.isOverflowDay();
+        if (isOverflow) {
             itemView.setSelected(false);
             day.setTextColor(
                     res.getColor(android.R.color.tertiary_text_light)
             );
-        }
-    }
-
-    /**
-     * @return true if this day needs to be highlighted
-     */
-    private boolean isHighlighted(Date dayValue) {
-        if (daySelector == null) {
-            return false;
+            return;
         }
 
-        return daySelector.isHighlightedDate(dayValue);
+        if (calendarDay.isHighlighted()) {
+            itemView.setSelected(true);
+            day.setTextColor(
+                    res.getColor(android.R.color.primary_text_dark)
+            );
+        } else {
+            itemView.setSelected(false);
+            day.setTextColor(
+                    res.getColor(android.R.color.primary_text_light)
+            );
+        }
     }
 
     @Override
@@ -142,7 +123,7 @@ public class CalendarDayViewHolder
         }
 
         daySelector.onDayPressed(
-                calendarDay.getDate()
+                calendarDay
         );
     }
 }

@@ -10,11 +10,20 @@ public class CalendarDay
         implements
         Serializable {
 
+    public interface DaySelector {
+
+        void onDayPressed(CalendarDay calendarDay);
+
+    }
+
     private int year;
     private int month;
     private int day;
     private Date date;
+
     private boolean isOverflowDay;
+    private boolean isHighlighted;
+    private boolean isToday;
 
     public CalendarDay() {
     }
@@ -57,5 +66,21 @@ public class CalendarDay
 
     public void setOverflowDay(boolean overflowDay) {
         isOverflowDay = overflowDay;
+    }
+
+    public boolean isHighlighted() {
+        return isHighlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        isHighlighted = highlighted;
+    }
+
+    public boolean isToday() {
+        return isToday;
+    }
+
+    public void setToday(boolean today) {
+        isToday = today;
     }
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -26,11 +27,10 @@ import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.Agend
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaHeader;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaItem;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaNoEvent;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.AgendaAdapter;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.CalendarAdapter;
-import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.CalendarDayViewHolder;
-import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
 
 /**
@@ -42,7 +42,7 @@ public class MainActivity
         AppCompatActivity
         implements
         View.OnClickListener,
-        CalendarDayViewHolder.DaySelector {
+        CalendarDay.DaySelector {
 
     private static final String[] randomEventNames = {
             "China Joy",
@@ -66,12 +66,14 @@ public class MainActivity
     private LinearLayoutManager agendaLinearLayoutManager;
     private AgendaAdapter agendaAdapter;
     private List<AgendaItem> agendaItems = new ArrayList<>();
-    private List<CalendarMonth> calendarItems = new ArrayList<>();
+    private HashMap<String, AgendaItem> agendaHeaders = new HashMap<>();
 
     //CALENDAR VIEWS & DATA
     private RecyclerView calendar;
     private CalendarAdapter calendarAdapter;
-    private Date highlightedDay = new Date();
+    private CalendarDay previousHighlightedDay;
+    private List<CalendarMonth> calendarItems = new ArrayList<>();
+    private HashMap<String, CalendarMonth> calendarItemsMap = new HashMap<>();
 
     //ACTIVITY VIEWS & DATA
     private FloatingActionButton fab;
@@ -102,6 +104,11 @@ public class MainActivity
             AgendaHeader agendaHeader = new AgendaHeader();
             agendaHeader.setDate(date);
             agendaItems.add(
+                    agendaHeader
+            );
+
+            agendaHeaders.put(
+                    DateTimeUtils.dayOfTheYear.format(date),
                     agendaHeader
             );
 
@@ -171,14 +178,19 @@ public class MainActivity
             calendarMonth.setYear(year);
             calendarMonth.setMonth(month);
             try {
-                calendarMonth.setFirstDayOfTheMonth(
-                        DateTimeUtils.dayOfTheYear.parse(
-                                getString(
-                                        R.string.oaec_calendar_month_first_day,
-                                        year,
-                                        month
-                                )
+                Date firstDayOfTheMonth = DateTimeUtils.dayOfTheYear.parse(
+                        getString(
+                                R.string.oaec_calendar_month_first_day,
+                                year,
+                                month
                         )
+                );
+
+                calendarMonth.setFirstDayOfTheMonth(
+                        firstDayOfTheMonth
+                );
+                calendarMonth.setFirstWeekDayOfTheMonth(
+                        getFirstDayOfWeek(firstDayOfTheMonth)
                 );
 
                 long firstDayOfNextMonthTime = DateTimeUtils.dayOfTheYear.parse(
@@ -198,21 +210,30 @@ public class MainActivity
                 );
             } catch (ParseException ignored) {
             }
+            calendarItemsMap.put(
+                    String.valueOf(year) + String.valueOf(month),
+                    calendarMonth
+            );
             calendarItems.add(calendarMonth);
         }
-
     }
 
-    private final Calendar gregorianCalendar = new GregorianCalendar();
-
     public int getYear(Date date) {
+        Calendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(date);
         return gregorianCalendar.get(Calendar.YEAR);
     }
 
     public int getMonth(Date date) {
+        Calendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(date);
         return gregorianCalendar.get(Calendar.MONTH);
+    }
+
+    public int getFirstDayOfWeek(Date date) {
+        Calendar gregorianCalendar = new GregorianCalendar();
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.DAY_OF_WEEK);
     }
 
     private AgendaEvent createRandomEvent(
@@ -264,7 +285,7 @@ public class MainActivity
         initAgendaViews();
 
         scrollToDate(
-                highlightedDay
+                new Date()
         );
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -322,9 +343,12 @@ public class MainActivity
                         }
 
                         lastAdapterPosition = adapterPosition;
-                        highlightedDay = agendaAdapter
-                                .getItem(adapterPosition)
-                                .getDate();
+                        setHighlightedDay(
+                                agendaAdapter
+                                        .getItem(adapterPosition)
+                                        .getDate()
+                        );
+
                         calendarAdapter.notifyDataSetChanged();
 
                         return true;
@@ -396,38 +420,56 @@ public class MainActivity
     }
 
     @Override
-    public boolean isHighlightedDate(Date date) {
-        //Mark date as selected if is the same as currently selected one
-        return DateTimeUtils.isSameDay(
-                highlightedDay,
-                date
+    public void onDayPressed(CalendarDay pressedDay) {
+        scrollToDate(
+                pressedDay.getDate()
         );
-    }
-
-    @Override
-    public void onDayPressed(Date date) {
-        highlightedDay = date;
-        scrollToDate(date);
+        setHighlightedDay(pressedDay);
     }
 
     public void scrollToDate(Date date) {
-        for (int i = 0; i < CollectionUtils.size(agendaItems); i++) {
-            AgendaItem agendaItem = agendaItems.get(i);
-            if (!(agendaItem instanceof AgendaHeader)) {
-                continue;
-            }
-
-            Date itemDate = agendaItem.getDate();
-            if (DateTimeUtils.isSameDay(
-                    date,
-                    itemDate
-            )) {
-                agenda.scrollToPosition(i);
-                return;
-            }
-
-            agendaAdapter.notifyDataSetChanged();
-            calendarAdapter.notifyDataSetChanged();
-        }
+        String dayOfTheYear = DateTimeUtils.dayOfTheYear.format(date);
+        AgendaItem agendaItem = agendaHeaders.get(dayOfTheYear);
+        agenda.scrollToPosition(
+                agendaItems.indexOf(
+                        agendaItem
+                )
+        );
     }
+
+    private final Calendar highlightCalendar = new GregorianCalendar();
+
+    public void setHighlightedDay(Date date) {
+        highlightCalendar.setTime(date);
+
+        int year = highlightCalendar.get(Calendar.YEAR);
+        int month = highlightCalendar.get(Calendar.MONTH);
+        int day = highlightCalendar.get(Calendar.DAY_OF_MONTH);
+
+        CalendarMonth calendarMonth = calendarItemsMap.get(
+                String.valueOf(year) + String.valueOf(month + 1)
+        );
+
+        if (calendarMonth == null) {
+            return;
+        }
+
+        int position = day + calendarMonth.getFirstWeekDayOfTheMonth() - 1;
+        setHighlightedDay(
+                calendarMonth
+                        .getDays()
+                        .get(position)
+        );
+    }
+
+    public void setHighlightedDay(CalendarDay calendarDay) {
+        calendarDay.setHighlighted(true);
+
+        if (previousHighlightedDay != null) {
+            previousHighlightedDay.setHighlighted(false);
+        }
+
+        previousHighlightedDay = calendarDay;
+    }
+
 }

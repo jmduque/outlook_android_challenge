@@ -161,7 +161,7 @@ public class DateTimeUtils {
 
     /**
      * @return true if the provided @param date is within @param startDate and @param endDate
-     * If start or end date are null, we won't apply those dates as a limiter.
+     * with limits included. If start or end date are null, we won't apply those dates as a limiter.
      */
     public static boolean isDateWithinDates(
             @Nullable Date date,
@@ -178,6 +178,6 @@ public class DateTimeUtils {
         long startTime = startDate != null ? startDate.getTime() : 0;
         long endTime = endDate != null ? endDate.getTime() : Long.MAX_VALUE;
 
-        return dateTime > startTime && dateTime < endTime;
+        return dateTime >= startTime && dateTime <= endTime;
     }
 }
