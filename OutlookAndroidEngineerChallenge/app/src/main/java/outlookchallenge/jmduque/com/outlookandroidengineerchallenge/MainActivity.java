@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +15,6 @@ import android.view.View;
 
 import com.lsjwzh.widget.recyclerviewpager.RecyclerViewPager;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -142,30 +142,33 @@ public class MainActivity
      * Creates demo data for the calendar view spanning one year ago to one year later
      */
     private void initCalendarDemoData() {
+        //Use the first AgendaItem (assumed as header) as starting date
         Date date = agendaItems
                 .get(0)
                 .getDate();
 
+        //Use the last AgendaHeader to define last month that the use can visualize
         Date lastDate = null;
         for (int i = 1; lastDate == null; i++) {
             lastDate = agendaItems
-                    .get(
-                            agendaItems.size() - i
-                    )
+                    .get(agendaItems.size() - i)
                     .getDate();
         }
 
-        int startYear = getYear(date);
-        int startMonth = getMonth(date);
+        //Define first visible month by year and month
+        int startYear = DateTimeUtils.getYear(date);
+        int startMonth = DateTimeUtils.getMonth(date);
 
-        int endYear = getYear(lastDate);
-        int endMonth = getMonth(lastDate);
+        //Define last visible month by year and month
+        int endYear = DateTimeUtils.getYear(lastDate);
+        int endMonth = DateTimeUtils.getMonth(lastDate);
 
         int year = startYear;
         int month = startMonth;
 
         CalendarMonthController calendarMonthController = new CalendarMonthController();
 
+        //From the starting year/month to the end year/month
         for (int i = 0;
              !(year == endYear && month == endMonth);
              i++) {
@@ -174,52 +177,13 @@ public class MainActivity
             year = startYear;
             year += month / 12;
             month = month % 12;
+            CalendarMonth calendarMonth = calendarMonthController.generateCalendarMonth(
+                    this,
+                    year,
+                    month
+            );
 
-            int nextMonth = startMonth + i + 1;
-            int nextYear = startYear;
-            nextYear += nextMonth / 12;
-            nextMonth = nextMonth % 12;
-
-            CalendarMonth calendarMonth = new CalendarMonth();
-            calendarMonth.setYear(year);
-            calendarMonth.setMonth(month);
-            try {
-                Date firstDayOfTheMonth = DateTimeUtils.dayOfTheYear.parse(
-                        getString(
-                                R.string.oaec_calendar_month_first_day,
-                                year,
-                                month + 1
-                        )
-                );
-
-                calendarMonth.setFirstDayOfTheMonth(
-                        firstDayOfTheMonth
-                );
-                calendarMonth.setMonthName(
-                        DateTimeUtils.monthName.format(firstDayOfTheMonth)
-                );
-                calendarMonth.setFirstWeekDayOfTheMonth(
-                        getFirstDayOfWeek(firstDayOfTheMonth)
-                );
-
-                long firstDayOfNextMonthTime = DateTimeUtils.dayOfTheYear.parse(
-                        getString(
-                                R.string.oaec_calendar_month_first_day,
-                                nextYear,
-                                nextMonth + 1
-                        )
-                ).getTime();
-                //Last day of this month is 1ms earlier than the begining of next month
-                calendarMonth.setLastDayOfTheMonth(
-                        new Date(firstDayOfNextMonthTime - 1)
-                );
-
-                calendarMonthController.generateCalendarDays(
-                        calendarMonth
-                );
-            } catch (ParseException ignored) {
-            }
-
+            //Add to a map for access proposes
             String key = calendarKeyFormatter(
                     year,
                     month
@@ -228,36 +192,15 @@ public class MainActivity
                     key,
                     calendarMonth
             );
+
+            //Add to the array for visualization proposes
             calendarItems.add(calendarMonth);
         }
     }
 
-    public int getYear(Date date) {
-        gregorianCalendar.setTime(date);
-        return gregorianCalendar.get(Calendar.YEAR);
-    }
-
     /**
-     * @return 0-based month of the year
+     * @return String to be used as accessibility key for the calendarMap
      */
-    public int getMonth(Date date) {
-        gregorianCalendar.setTime(date);
-        return gregorianCalendar.get(Calendar.MONTH);
-    }
-
-    /**
-     * @return returns the value of the day of the month
-     */
-    public int getDay(Date date) {
-        gregorianCalendar.setTime(date);
-        return gregorianCalendar.get(Calendar.DAY_OF_MONTH);
-    }
-
-    public int getFirstDayOfWeek(Date date) {
-        gregorianCalendar.setTime(date);
-        return gregorianCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-    }
-
     private String calendarKeyFormatter(
             int year,
             int month
@@ -269,6 +212,10 @@ public class MainActivity
         );
     }
 
+    /**
+     * @param random seed to use to create the events
+     * @param date   date to be associated to the created event
+     */
     private AgendaEvent createRandomEvent(
             Random random,
             Date date
@@ -376,6 +323,11 @@ public class MainActivity
                 pinnedHeaderDecoration
         );
 
+        //Add basic animation for adding/removing items
+        agenda.setItemAnimator(
+                new DefaultItemAnimator()
+        );
+
         agendaAdapter = new AgendaAdapter(
                 this,
                 agendaItems
@@ -472,14 +424,54 @@ public class MainActivity
     }
 
     private void handleFabClick(View view) {
+        if (firstVisibleAgendaHeader == null) {
+            return;
+        }
+
         Snackbar.make(
                 view,
-                "Replace with your own action",
+                "Created Random Agenda Event on Current Date",
                 Snackbar.LENGTH_LONG
         ).setAction(
-                "Action",
+                android.R.string.ok,
                 null
         ).show();
+
+        //Get position of the header
+        int headerPosition = agendaItems.indexOf(
+                firstVisibleAgendaHeader
+        );
+        //Create new calendar event
+        AgendaEvent agendaEvent = createRandomEvent(
+                new Random(),
+                firstVisibleAgendaHeader.getDate()
+        );
+
+        //If current view after header is a non-event view, remove it
+        int expectedPosition = headerPosition + 1;
+        AgendaItem nextAgendaItem = agendaItems.get(expectedPosition);
+        if (nextAgendaItem instanceof AgendaNoEvent) {
+            agendaItems.remove(expectedPosition);
+            agendaAdapter.notifyItemRemoved(
+                    expectedPosition
+            );
+        }
+
+        //Add event to the list below the header
+        agendaItems.add(
+                expectedPosition,
+                agendaEvent
+        );
+
+        //Notify Adapter item has been added
+        agendaAdapter.notifyItemInserted(
+                expectedPosition
+        );
+
+        //Make sure day's haader is first view
+        agendaLinearLayoutManager.scrollToPosition(
+                headerPosition
+        );
     }
 
     @Override
@@ -540,9 +532,9 @@ public class MainActivity
     public void setHighlightedDay(Date date) {
         gregorianCalendar.setTime(date);
 
-        int year = getYear(date);
-        int month = getMonth(date);
-        int day = getDay(date);
+        int year = DateTimeUtils.getYear(date);
+        int month = DateTimeUtils.getMonth(date);
+        int day = DateTimeUtils.getDay(date);
 
         String key = calendarKeyFormatter(
                 year,

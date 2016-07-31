@@ -5,7 +5,9 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -13,6 +15,8 @@ import java.util.Locale;
  * This class helps with date creations and comparisons.
  */
 public class DateTimeUtils {
+
+    public static final Calendar gregorianCalendar = new GregorianCalendar();
 
     public static final SimpleDateFormat dayOfTheYear = new SimpleDateFormat(
             "yyyy-MM-dd",
@@ -163,7 +167,6 @@ public class DateTimeUtils {
         }
     }
 
-
     /**
      * @return true if the provided @param date is within @param startDate and @param endDate
      * with limits included. If start or end date are null, we won't apply those dates as a limiter.
@@ -184,5 +187,35 @@ public class DateTimeUtils {
         long endTime = endDate != null ? endDate.getTime() : Long.MAX_VALUE;
 
         return dateTime >= startTime && dateTime <= endTime;
+    }
+
+
+    public static int getYear(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.YEAR);
+    }
+
+    /**
+     * @return 0-based month of the year
+     */
+    public static int getMonth(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.MONTH);
+    }
+
+    /**
+     * @return returns the value of the day of the month
+     */
+    public static int getDay(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * @return 0-based day of the week (Sunday == 0)
+     */
+    public static int getFirstDayOfWeek(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.DAY_OF_WEEK) - 1;
     }
 }

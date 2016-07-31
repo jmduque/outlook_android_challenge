@@ -1,13 +1,17 @@
 package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.controller;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
@@ -18,6 +22,67 @@ import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTi
 public class CalendarMonthController {
 
     public static final int DAYS_IN_A_WEEK = 7;
+
+    /**
+     * This method generates a CalendarMonth object by a provided year and month value.
+     *
+     * @param context to be used to generate strings
+     * @param year    the calendar year i.e., 2016-06-30 -> need to provide 2016
+     * @param month   the 0-based calendar month i.e., 2016-06-30 -> need to provide 5
+     */
+    public CalendarMonth generateCalendarMonth(
+            @NonNull final Context context,
+            final int year,
+            final int month
+    ) {
+        int nextMonth = month + 1;
+        int nextYear = year;
+        nextYear += nextMonth / 12;
+        nextMonth = nextMonth % 12;
+
+        //We generate a calendar event
+        CalendarMonth calendarMonth = new CalendarMonth();
+        calendarMonth.setYear(year);
+        calendarMonth.setMonth(month);
+        try {
+            Date firstDayOfTheMonth = DateTimeUtils.dayOfTheYear.parse(
+                    context.getString(
+                            R.string.oaec_calendar_month_first_day,
+                            year,
+                            month + 1
+                    )
+            );
+
+            calendarMonth.setFirstDayOfTheMonth(
+                    firstDayOfTheMonth
+            );
+            calendarMonth.setMonthName(
+                    DateTimeUtils.monthName.format(firstDayOfTheMonth)
+            );
+            calendarMonth.setFirstWeekDayOfTheMonth(
+                    DateTimeUtils.getFirstDayOfWeek(firstDayOfTheMonth)
+            );
+
+            long firstDayOfNextMonthTime = DateTimeUtils.dayOfTheYear.parse(
+                    context.getString(
+                            R.string.oaec_calendar_month_first_day,
+                            nextYear,
+                            nextMonth + 1
+                    )
+            ).getTime();
+            //Last day of this month is 1ms earlier than the begining of next month
+            calendarMonth.setLastDayOfTheMonth(
+                    new Date(firstDayOfNextMonthTime - 1)
+            );
+
+            generateCalendarDays(
+                    calendarMonth
+            );
+        } catch (ParseException ignored) {
+        }
+
+        return calendarMonth;
+    }
 
     /**
      * Creates the calendar days of a month including overflow (i.e., if a month does not start
