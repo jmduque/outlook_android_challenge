@@ -24,6 +24,11 @@ public class DateTimeUtils {
             Locale.getDefault()
     );
 
+    public static final SimpleDateFormat monthName = new SimpleDateFormat(
+            "MMMM",
+            Locale.getDefault()
+    );
+
     public static final SimpleDateFormat year = new SimpleDateFormat(
             "yyyy",
             Locale.getDefault()

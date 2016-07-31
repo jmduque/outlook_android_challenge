@@ -35,6 +35,7 @@ public class CalendarAdapter
         this.layoutInflater = LayoutInflater.from(this.context);
         this.daySelector = daySelector;
         this.items = items;
+        setHasStableIds(true);
     }
 
     @Override

@@ -61,6 +61,8 @@ public class MainActivity
             "Barcelona"
     };
 
+    private final Calendar gregorianCalendar = new GregorianCalendar();
+
     //AGENDA VIEWS & DATA
     private RecyclerView agenda;
     private LinearLayoutManager agendaLinearLayoutManager;
@@ -161,7 +163,7 @@ public class MainActivity
         CalendarMonthController calendarMonthController = new CalendarMonthController();
 
         for (int i = 0;
-             year != endYear && month != endMonth;
+             !(year == endYear && month == endMonth);
              i++) {
 
             month = startMonth + i;
@@ -182,12 +184,15 @@ public class MainActivity
                         getString(
                                 R.string.oaec_calendar_month_first_day,
                                 year,
-                                month
+                                month + 1
                         )
                 );
 
                 calendarMonth.setFirstDayOfTheMonth(
                         firstDayOfTheMonth
+                );
+                calendarMonth.setMonthName(
+                        DateTimeUtils.monthName.format(firstDayOfTheMonth)
                 );
                 calendarMonth.setFirstWeekDayOfTheMonth(
                         getFirstDayOfWeek(firstDayOfTheMonth)
@@ -197,7 +202,7 @@ public class MainActivity
                         getString(
                                 R.string.oaec_calendar_month_first_day,
                                 nextYear,
-                                nextMonth
+                                nextMonth + 1
                         )
                 ).getTime();
                 //Last day of this month is 1ms earlier than the begining of next month
@@ -210,8 +215,13 @@ public class MainActivity
                 );
             } catch (ParseException ignored) {
             }
+
+            String key = calendarKeyFormatter(
+                    year,
+                    month
+            );
             calendarItemsMap.put(
-                    String.valueOf(year) + String.valueOf(month),
+                    key,
                     calendarMonth
             );
             calendarItems.add(calendarMonth);
@@ -219,21 +229,40 @@ public class MainActivity
     }
 
     public int getYear(Date date) {
-        Calendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(date);
         return gregorianCalendar.get(Calendar.YEAR);
     }
 
+    /**
+     * @return 0-based month of the year
+     */
     public int getMonth(Date date) {
-        Calendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(date);
         return gregorianCalendar.get(Calendar.MONTH);
     }
 
+    /**
+     * @return returns the value of the day of the month
+     */
+    public int getDay(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.DAY_OF_MONTH);
+    }
+
     public int getFirstDayOfWeek(Date date) {
-        Calendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(date);
         return gregorianCalendar.get(Calendar.DAY_OF_WEEK);
+    }
+
+    private String calendarKeyFormatter(
+            int year,
+            int month
+    ) {
+        return getString(
+                R.string.oaec_calendar_key_format,
+                year,
+                month
+        );
     }
 
     private AgendaEvent createRandomEvent(
@@ -284,7 +313,7 @@ public class MainActivity
         initCalendarViews();
         initAgendaViews();
 
-        scrollToDate(
+        scrollAgendaToDate(
                 new Date()
         );
 
@@ -330,27 +359,11 @@ public class MainActivity
         pinnedHeaderDecoration.registerTypePinnedHeader(
                 AgendaAdapter.HEADER,
                 new PinnedHeaderDecoration.PinnedHeaderCreator() {
-
-                    private int lastAdapterPosition = 0;
-
                     @Override
                     public boolean create(
                             RecyclerView parent,
                             int adapterPosition
                     ) {
-                        if (lastAdapterPosition == adapterPosition) {
-                            return true;
-                        }
-
-                        lastAdapterPosition = adapterPosition;
-                        setHighlightedDay(
-                                agendaAdapter
-                                        .getItem(adapterPosition)
-                                        .getDate()
-                        );
-
-                        calendarAdapter.notifyDataSetChanged();
-
                         return true;
                     }
                 }
@@ -369,10 +382,42 @@ public class MainActivity
         );
     }
 
+    private void onNewHeaderDate(Date date) {
+        setHighlightedDay(
+                date
+        );
+
+        scrollCalendarToDate(
+                date
+        );
+
+        calendarAdapter.notifyDataSetChanged();
+    }
+
     /**
      * Setups the listeners for the views within the activity
      */
     private void setListeners() {
+        agenda.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            private AgendaHeader firstVisibleAgendaHeader;
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstCompletelyVisibleItemPosition =
+                        agendaLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
+                AgendaItem agendaItem = agendaItems.get(firstCompletelyVisibleItemPosition);
+                if (agendaItem instanceof AgendaHeader) {
+                    if (firstVisibleAgendaHeader == agendaItem) {
+                        return;
+                    }
+
+                    firstVisibleAgendaHeader = (AgendaHeader) agendaItem;
+                    onNewHeaderDate(agendaItem.getDate());
+                }
+            }
+        });
         fab.setOnClickListener(this);
     }
 
@@ -421,13 +466,13 @@ public class MainActivity
 
     @Override
     public void onDayPressed(CalendarDay pressedDay) {
-        scrollToDate(
+        setHighlightedDay(pressedDay);
+        scrollAgendaToDate(
                 pressedDay.getDate()
         );
-        setHighlightedDay(pressedDay);
     }
 
-    public void scrollToDate(Date date) {
+    public void scrollAgendaToDate(Date date) {
         String dayOfTheYear = DateTimeUtils.dayOfTheYear.format(date);
         AgendaItem agendaItem = agendaHeaders.get(dayOfTheYear);
         agenda.scrollToPosition(
@@ -437,17 +482,50 @@ public class MainActivity
         );
     }
 
-    private final Calendar highlightCalendar = new GregorianCalendar();
+    public void scrollCalendarToDate(Date date) {
+        gregorianCalendar.setTime(date);
 
-    public void setHighlightedDay(Date date) {
-        highlightCalendar.setTime(date);
+        int year = gregorianCalendar.get(Calendar.YEAR);
+        int month = gregorianCalendar.get(Calendar.MONTH);
 
-        int year = highlightCalendar.get(Calendar.YEAR);
-        int month = highlightCalendar.get(Calendar.MONTH);
-        int day = highlightCalendar.get(Calendar.DAY_OF_MONTH);
+        String key = calendarKeyFormatter(
+                year,
+                month
+        );
 
         CalendarMonth calendarMonth = calendarItemsMap.get(
-                String.valueOf(year) + String.valueOf(month + 1)
+                key
+        );
+
+        if (calendarMonth == null) {
+            return;
+        }
+
+        setTitle(
+                calendarMonth.getMonthName()
+        );
+
+        calendar.scrollToPosition(
+                calendarItems.indexOf(
+                        calendarMonth
+                )
+        );
+    }
+
+    public void setHighlightedDay(Date date) {
+        gregorianCalendar.setTime(date);
+
+        int year = getYear(date);
+        int month = getMonth(date);
+        int day = getDay(date);
+
+        String key = calendarKeyFormatter(
+                year,
+                month
+        );
+
+        CalendarMonth calendarMonth = calendarItemsMap.get(
+                key
         );
 
         if (calendarMonth == null) {

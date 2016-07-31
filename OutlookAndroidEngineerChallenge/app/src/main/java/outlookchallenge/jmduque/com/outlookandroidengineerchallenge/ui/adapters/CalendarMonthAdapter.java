@@ -44,6 +44,7 @@ public class CalendarMonthAdapter
         this.context = context;
         this.layoutInflater = LayoutInflater.from(this.context);
         this.daySelector = daySelector;
+        setHasStableIds(true);
     }
 
     public RecyclerView.LayoutManager makeLayoutManager() {

@@ -85,11 +85,6 @@ public class CalendarDayViewHolder
                         calendarDay.getDay()
                 )
         );
-
-        //Overflow days are not clickable
-        itemView.setEnabled(
-                !calendarDay.isOverflowDay()
-        );
     }
 
     private void updateHighlight() {

@@ -13,6 +13,7 @@ public class CalendarMonth
 
     private int year;
     private int month; //0 Based;
+    private String monthName;
     private Date firstDayOfTheMonth;
     private int firstWeekDayOfTheMonth;
     private Date lastDayOfTheMonth;
@@ -35,6 +36,14 @@ public class CalendarMonth
 
     public void setMonth(int month) {
         this.month = month;
+    }
+
+    public String getMonthName() {
+        return monthName;
+    }
+
+    public void setMonthName(String monthName) {
+        this.monthName = monthName;
     }
 
     public Date getFirstDayOfTheMonth() {
