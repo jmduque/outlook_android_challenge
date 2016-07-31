@@ -4,8 +4,6 @@ import android.content.res.Resources;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.Date;
-
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
 
 /**
@@ -20,12 +18,10 @@ public class CalendarHeaderViewHolder
     private Integer weekDay; //0 BASED, 0 == SUNDAY
 
     public CalendarHeaderViewHolder(
-            View itemView,
-            Date firstDayOfTheMonth
+            View itemView
     ) {
         super(
-                itemView,
-                firstDayOfTheMonth
+                itemView
         );
     }
 

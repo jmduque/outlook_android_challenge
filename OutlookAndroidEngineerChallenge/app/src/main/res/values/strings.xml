@@ -28,5 +28,6 @@
     <string name="oaec_calendar_saturday">Sat</string>
     <string name="oaec_calendar_sunday">Sun</string>
     <string name="oaec_calendar_month_first_day">%1$04d-%2$02d-01</string>
+    <string name="oaec_calendar_day_of_the_month">%1$02d</string>
 
 </resources>

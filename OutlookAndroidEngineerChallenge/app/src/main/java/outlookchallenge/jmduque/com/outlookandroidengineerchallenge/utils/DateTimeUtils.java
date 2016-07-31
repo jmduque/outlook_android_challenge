@@ -1,5 +1,6 @@
 package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
@@ -155,5 +156,28 @@ public class DateTimeUtils {
                     year.format(comparableDate)
             );
         }
+    }
+
+
+    /**
+     * @return true if the provided @param date is within @param startDate and @param endDate
+     * If start or end date are null, we won't apply those dates as a limiter.
+     */
+    public static boolean isDateWithinDates(
+            @Nullable Date date,
+            @Nullable Date startDate,
+            @Nullable Date endDate
+    ) {
+        //If no date is provided, we will always return false
+        if (date == null) {
+            return false;
+        }
+
+        long dateTime = date.getTime();
+        //
+        long startTime = startDate != null ? startDate.getTime() : 0;
+        long endTime = endDate != null ? endDate.getTime() : Long.MAX_VALUE;
+
+        return dateTime > startTime && dateTime < endTime;
     }
 }

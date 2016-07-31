@@ -1,5 +1,7 @@
 package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils;
 
+import android.support.annotation.Nullable;
+
 import junit.framework.Assert;
 
 import org.junit.Test;

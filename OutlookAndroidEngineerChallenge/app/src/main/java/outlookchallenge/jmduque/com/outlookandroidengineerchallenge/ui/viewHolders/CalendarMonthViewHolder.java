@@ -3,9 +3,8 @@ package outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHold
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import java.util.Date;
-
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.CalendarMonthAdapter;
 
 /**
@@ -22,7 +21,7 @@ public class CalendarMonthViewHolder
     private CalendarMonthAdapter monthAdapter;
 
     //First day of the month we want this view to represent
-    private Date firstDayOfTheMonth;
+    private CalendarMonth calendarMonth;
 
     public CalendarMonthViewHolder(
             View itemView,
@@ -33,13 +32,13 @@ public class CalendarMonthViewHolder
     }
 
     @Override
-    public Date getModel() {
-        return firstDayOfTheMonth;
+    public CalendarMonth getModel() {
+        return calendarMonth;
     }
 
     @Override
     public void setModel(Object object) {
-        firstDayOfTheMonth = (Date) object;
+        calendarMonth = (CalendarMonth) object;
     }
 
     @Override
@@ -64,8 +63,7 @@ public class CalendarMonthViewHolder
             );
             month.setAdapter(monthAdapter);
         }
-
-        monthAdapter.setFirstDayOfTheMonth(firstDayOfTheMonth);
+        monthAdapter.setItems(calendarMonth.getDays());
         monthAdapter.notifyDataSetChanged();
     }
 }

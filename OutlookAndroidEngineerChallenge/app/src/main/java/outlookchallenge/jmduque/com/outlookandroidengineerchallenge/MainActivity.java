@@ -12,16 +12,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 
 import app.dinus.com.itemdecoration.PinnedHeaderDecoration;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.controller.CalendarMonthController;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaEvent;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaHeader;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaItem;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaNoEvent;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.AgendaAdapter;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.CalendarAdapter;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.CalendarDayViewHolder;
@@ -61,6 +66,7 @@ public class MainActivity
     private LinearLayoutManager agendaLinearLayoutManager;
     private AgendaAdapter agendaAdapter;
     private List<AgendaItem> agendaItems = new ArrayList<>();
+    private List<CalendarMonth> calendarItems = new ArrayList<>();
 
     //CALENDAR VIEWS & DATA
     private RecyclerView calendar;
@@ -73,7 +79,8 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initDemoData();
+        initAgendaDemoData();
+        initCalendarDemoData();
         bindViews();
         setListeners();
     }
@@ -81,7 +88,7 @@ public class MainActivity
     /**
      * Creates data for demo proposes spanning between one year ago and one year later
      */
-    private void initDemoData() {
+    private void initAgendaDemoData() {
         Date today = new Date();
         //STARTING ONE YEAR AGO
         Date date = new Date(
@@ -116,6 +123,96 @@ public class MainActivity
                     date.getTime() + DateUtils.DAY_IN_MILLIS
             );
         }
+    }
+
+    /**
+     * Creates demo data for the calendar view spanning one year ago to one year later
+     */
+    private void initCalendarDemoData() {
+        Date date = agendaItems
+                .get(0)
+                .getDate();
+
+        Date lastDate = null;
+        for (int i = 1; lastDate == null; i++) {
+            lastDate = agendaItems
+                    .get(
+                            agendaItems.size() - i
+                    )
+                    .getDate();
+        }
+
+        int startYear = getYear(date);
+        int startMonth = getMonth(date);
+
+        int endYear = getYear(lastDate);
+        int endMonth = getMonth(lastDate);
+
+        int year = startYear;
+        int month = startMonth;
+
+        CalendarMonthController calendarMonthController = new CalendarMonthController();
+
+        for (int i = 0;
+             year != endYear && month != endMonth;
+             i++) {
+
+            month = startMonth + i;
+            year = startYear;
+            year += month / 12;
+            month = month % 12;
+
+            int nextMonth = startMonth + i + 1;
+            int nextYear = startYear;
+            nextYear += nextMonth / 12;
+            nextMonth = nextMonth % 12;
+
+            CalendarMonth calendarMonth = new CalendarMonth();
+            calendarMonth.setYear(year);
+            calendarMonth.setMonth(month);
+            try {
+                calendarMonth.setFirstDayOfTheMonth(
+                        DateTimeUtils.dayOfTheYear.parse(
+                                getString(
+                                        R.string.oaec_calendar_month_first_day,
+                                        year,
+                                        month
+                                )
+                        )
+                );
+
+                long firstDayOfNextMonthTime = DateTimeUtils.dayOfTheYear.parse(
+                        getString(
+                                R.string.oaec_calendar_month_first_day,
+                                nextYear,
+                                nextMonth
+                        )
+                ).getTime();
+                //Last day of this month is 1ms earlier than the begining of next month
+                calendarMonth.setLastDayOfTheMonth(
+                        new Date(firstDayOfNextMonthTime - 1)
+                );
+
+                calendarMonthController.generateCalendarDays(
+                        calendarMonth
+                );
+            } catch (ParseException ignored) {
+            }
+            calendarItems.add(calendarMonth);
+        }
+
+    }
+
+    private final Calendar gregorianCalendar = new GregorianCalendar();
+
+    public int getYear(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.YEAR);
+    }
+
+    public int getMonth(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.MONTH);
     }
 
     private AgendaEvent createRandomEvent(
@@ -186,19 +283,10 @@ public class MainActivity
                 )
         );
 
-//        calendar.addItemDecoration(
-//                new VerticalDividerItemDecoration.Builder(this)
-//                        .color(android.R.color.white)
-//                        .size(R.dimen.oaec_large_spacing)
-//                        .build()
-//        );
-
         calendarAdapter = new CalendarAdapter(
                 this,
                 this,
-                2016,
-                7,
-                24
+                calendarItems
         );
 
         calendar.setAdapter(

@@ -5,10 +5,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.CalendarDayViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.CalendarMonthViewHolder;
-import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 
 /**
  * Created by Jose on 7/30/2016.
@@ -21,24 +24,17 @@ public class CalendarAdapter
     private Context context;
     private LayoutInflater layoutInflater;
     private CalendarDayViewHolder.DaySelector daySelector;
-
-    private int startYear;
-    private int startMonth; //0 BASE MONTH
-    private int totalMonths; //NUMBER OF MONTHS TO DISPLAY
+    private final List<CalendarMonth> items;
 
     public CalendarAdapter(
             Context context,
             CalendarDayViewHolder.DaySelector daySelector,
-            int startYear,
-            int startMonth,
-            int totalMonths
+            List<CalendarMonth> items
     ) {
         this.context = context;
         this.layoutInflater = LayoutInflater.from(this.context);
         this.daySelector = daySelector;
-        this.startYear = startYear;
-        this.startMonth = startMonth;
-        this.totalMonths = totalMonths;
+        this.items = items;
     }
 
     @Override
@@ -61,30 +57,27 @@ public class CalendarAdapter
             CalendarMonthViewHolder holder,
             int position
     ) {
-        int month = startMonth + position;
-        int year = startYear;
-        year += month / 12;
-        month = month % 12;
-
-        try {
-            holder.setModel(
-                    DateTimeUtils.dayOfTheYear.parse(
-                            context.getString(
-                                    R.string.oaec_calendar_month_first_day,
-                                    year,
-                                    month
-                            )
-                    )
-            );
-        } catch (Exception ignored) {
-            holder.setModel(null);
-        }
-
+        //Update holder's model
+        holder.setModel(
+                getItem(position)
+        );
+        //Update holder's view
         holder.updateView();
     }
 
     @Override
     public int getItemCount() {
-        return totalMonths;
+        return CollectionUtils.size(items);
+    }
+
+    public CalendarMonth getItem(int position) {
+        if (!CollectionUtils.isValidPosition(
+                items,
+                position
+        )) {
+            return null;
+        }
+
+        return items.get(position);
     }
 }

@@ -4,6 +4,8 @@ import android.view.View;
 
 import java.util.Date;
 
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
+
 /**
  * Created by Jose on 7/28/2016.
  */
@@ -11,22 +13,19 @@ public abstract class BaseCalendarDayViewHolder
         extends
         BaseViewHolder {
 
-    protected Date firstDayOfTheMonth;
+    private CalendarDay calendarDay;
 
     public BaseCalendarDayViewHolder(
-            View itemView,
-            Date firstDayOfTheMonth
+            View itemView
     ) {
         super(itemView);
-        this.firstDayOfTheMonth = firstDayOfTheMonth;
     }
 
-    public Date getFirstDayOfTheMonth() {
-        return firstDayOfTheMonth;
+    public CalendarDay getCalendarDay() {
+        return calendarDay;
     }
 
-    public void setFirstDayOfTheMonth(Date firstDayOfTheMonth) {
-        this.firstDayOfTheMonth = firstDayOfTheMonth;
+    public void setCalendarDay(CalendarDay calendarDay) {
+        this.calendarDay = calendarDay;
     }
-
 }

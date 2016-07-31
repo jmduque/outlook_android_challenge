@@ -7,7 +7,7 @@ import android.widget.TextView;
 import java.util.Date;
 
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.R;
-import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 
 /**
  * Created by Jose on 7/30/2016.
@@ -18,14 +18,6 @@ public class CalendarDayViewHolder
         BaseCalendarDayViewHolder
         implements
         View.OnClickListener {
-
-    public boolean isSameMonth() {
-        return isSameMonth;
-    }
-
-    public void setSameMonth(boolean sameMonth) {
-        isSameMonth = sameMonth;
-    }
 
     public interface DaySelector {
 
@@ -38,31 +30,27 @@ public class CalendarDayViewHolder
     private DaySelector daySelector;
 
     private TextView day;
-    private Date dayValue;
-    private boolean isSameMonth;
-
-    private Date lastUpdateDayValue;
+    private CalendarDay calendarDay;
+    private int lastUpdateDayValue;
 
     public CalendarDayViewHolder(
             View itemView,
-            DaySelector daySelector,
-            Date firstDayOfTheMonth
+            DaySelector daySelector
     ) {
         super(
-                itemView,
-                firstDayOfTheMonth
+                itemView
         );
         this.daySelector = daySelector;
     }
 
     @Override
-    public Date getModel() {
-        return dayValue;
+    public CalendarDay getModel() {
+        return calendarDay;
     }
 
     @Override
     public void setModel(Object object) {
-        this.dayValue = (Date) object;
+        this.calendarDay = (CalendarDay) object;
     }
 
     @Override
@@ -77,31 +65,40 @@ public class CalendarDayViewHolder
 
     @Override
     public void updateView() {
-        if (dayValue != lastUpdateDayValue) {
-            setDay(dayValue);
+        int day = calendarDay.getDay();
+        if (day != lastUpdateDayValue) {
+            setDay(
+                    calendarDay
+            );
         }
 
-        updateHighlight(dayValue);
-
-        lastUpdateDayValue = dayValue;
+        updateHighlight(calendarDay.getDate());
+        lastUpdateDayValue = day;
     }
 
-    private void setDay(Date dayValue) {
+    private void setDay(
+            CalendarDay calendarDay
+    ) {
         if (day == null) {
             return;
         }
 
-        if (dayValue == null) {
+        if (calendarDay == null) {
             day.setText(null);
             return;
         }
 
+        Resources res = day.getResources();
         day.setText(
-                DateTimeUtils.dayOfTheMonth.format(dayValue)
+                res.getString(
+                        R.string.oaec_calendar_day_of_the_month,
+                        calendarDay.getDay()
+                )
         );
 
+        //Overflow days are not clickable
         itemView.setEnabled(
-                isSameMonth
+                !calendarDay.isOverflowDay()
         );
     }
 
@@ -144,6 +141,8 @@ public class CalendarDayViewHolder
             return;
         }
 
-        daySelector.onDayPressed(dayValue);
+        daySelector.onDayPressed(
+                calendarDay.getDate()
+        );
     }
 }
