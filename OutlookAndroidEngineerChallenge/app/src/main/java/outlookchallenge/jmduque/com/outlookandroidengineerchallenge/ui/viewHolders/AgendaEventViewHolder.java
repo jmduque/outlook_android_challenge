@@ -33,9 +33,9 @@ public class AgendaEventViewHolder
     public void bindViews(View itemView) {
         timeOfTheDayGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
         super.bindViews(this.itemView);
-        date = (TextView) itemView.findViewById(R.id.date);
-        duration = (TextView) itemView.findViewById(R.id.duration);
-        location = (TextView) itemView.findViewById(R.id.location);
+        date = (TextView) itemView.findViewById(R.id.tv_date);
+        duration = (TextView) itemView.findViewById(R.id.tv_duration);
+        location = (TextView) itemView.findViewById(R.id.tv_location);
     }
 
     @Override

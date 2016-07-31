@@ -4,7 +4,7 @@
     style="@style/oaec_agenda_cell">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/tv_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"

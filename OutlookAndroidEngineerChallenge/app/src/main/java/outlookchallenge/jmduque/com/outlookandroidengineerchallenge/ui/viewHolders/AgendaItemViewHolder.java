@@ -42,7 +42,7 @@ public abstract class AgendaItemViewHolder<T extends AgendaItem>
 
     @Override
     public void bindViews(View itemView) {
-        name = (TextView) itemView.findViewById(R.id.name);
+        name = (TextView) itemView.findViewById(R.id.tv_name);
     }
 
     @Override

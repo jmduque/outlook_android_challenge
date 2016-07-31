@@ -8,10 +8,15 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.lsjwzh.widget.recyclerviewpager.RecyclerViewPager;
 
@@ -80,6 +85,12 @@ public class MainActivity
     private CalendarDay previousHighlightedDay;
     private List<CalendarMonth> calendarItems = new ArrayList<>();
     private HashMap<String, CalendarMonth> calendarItemsMap = new HashMap<>();
+    private ItemTouchHelper calendarItemTouchHelper;
+
+    //Calendar Month Picker
+    private View monthPicker;
+    private TextView monthPickerName;
+    private ImageView monthPickerArrow;
 
     //ACTIVITY VIEWS & DATA
     private FloatingActionButton fab;
@@ -87,6 +98,7 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(null);
         initAgendaDemoData();
         initCalendarDemoData();
         bindViews();
@@ -263,6 +275,7 @@ public class MainActivity
 
         initCalendarViews();
         initAgendaViews();
+        initMonthPickerViews();
 
         scrollAgendaToDate(
                 new Date()
@@ -275,7 +288,7 @@ public class MainActivity
      * This method generates and initializes the views for the calendar
      */
     private void initCalendarViews() {
-        calendar = (RecyclerViewPager) findViewById(R.id.calendar);
+        calendar = (RecyclerViewPager) findViewById(R.id.rv_calendar);
         calendar.setLayoutManager(
                 new LinearLayoutManager(
                         this,
@@ -290,6 +303,32 @@ public class MainActivity
                 calendarItems
         );
 
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper
+                .SimpleCallback(
+                0,
+                ItemTouchHelper.UP
+        ) {
+            @Override
+            public boolean onMove(
+                    RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder,
+                    RecyclerView.ViewHolder target
+            ) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(
+                    RecyclerView.ViewHolder viewHolder,
+                    int direction
+            ) {
+                hideCalendar();
+            }
+        };
+
+        calendarItemTouchHelper = new ItemTouchHelper(simpleCallback);
+        calendarItemTouchHelper.attachToRecyclerView(calendar);
+
         calendar.setAdapter(
                 calendarAdapter
         );
@@ -299,7 +338,7 @@ public class MainActivity
      * This method generates and initializes the views for the agenda
      */
     private void initAgendaViews() {
-        agenda = (RecyclerView) findViewById(R.id.agenda);
+        agenda = (RecyclerView) findViewById(R.id.rv_agenda);
         agendaLinearLayoutManager = new LinearLayoutManager(this);
         agenda.setLayoutManager(
                 agendaLinearLayoutManager
@@ -336,6 +375,15 @@ public class MainActivity
         agenda.setAdapter(
                 agendaAdapter
         );
+    }
+
+    /**
+     * Init views related to the month picker view
+     */
+    private void initMonthPickerViews() {
+        monthPicker = findViewById(R.id.ll_month_picker);
+        monthPickerName = (TextView) findViewById(R.id.tv_month_picker_name);
+        monthPickerArrow = (ImageView) findViewById(R.id.iv_month_picker_arrow);
     }
 
     /**
@@ -384,10 +432,11 @@ public class MainActivity
                             return;
                         }
 
-                        setTitle(item.getMonthName());
+                        monthPickerName.setText(item.getMonthName());
                     }
                 }
         );
+        monthPicker.setOnClickListener(this);
         fab.setOnClickListener(this);
     }
 
@@ -484,11 +533,104 @@ public class MainActivity
         );
     }
 
+    /**
+     * Handles the action of the user pressing the month picker
+     *
+     * @param view the clicked one
+     */
+    private void handleMonthPickerClick(View view) {
+        if (calendar.getVisibility() == View.VISIBLE) {
+            hideCalendar();
+        } else {
+            showCalendar();
+        }
+    }
+
+    /**
+     * Changes calendar view to hidden status
+     */
+    private void hideCalendar() {
+        calendar.setVisibility(View.GONE);
+        //Animates arrow to make it face down again
+        Animation animation = AnimationUtils.loadAnimation(
+                this,
+                R.anim.half_rotation
+        );
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                monthPickerArrow.setImageResource(
+                        R.drawable.ic_expand_more_white_24dp
+                );
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        monthPickerArrow.startAnimation(
+                animation
+        );
+    }
+
+    /**
+     * Changes calendar view to visible status
+     */
+    private void showCalendar() {
+        calendar.setVisibility(View.VISIBLE);
+        calendarAdapter.notifyDataSetChanged();
+
+        //Need to reattach to avoid last hidden viewHolder to stay hidden
+        calendarItemTouchHelper.attachToRecyclerView(null);
+        calendarItemTouchHelper.attachToRecyclerView(calendar);
+
+        //Animates the arrow to make it face up
+        Animation animation = AnimationUtils.loadAnimation(
+                this,
+                R.anim.half_rotation
+        );
+
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                monthPickerArrow.setImageResource(
+                        R.drawable.ic_expand_less_white_24dp
+                );
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        monthPickerArrow.startAnimation(
+                animation
+        );
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab: {
                 handleFabClick(view);
+                break;
+            }
+            case R.id.ll_month_picker: {
+                handleMonthPickerClick(view);
                 break;
             }
         }
