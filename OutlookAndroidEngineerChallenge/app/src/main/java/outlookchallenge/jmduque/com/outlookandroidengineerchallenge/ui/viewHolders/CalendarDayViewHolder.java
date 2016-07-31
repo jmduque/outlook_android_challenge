@@ -85,26 +85,33 @@ public class CalendarDayViewHolder
                         calendarDay.getDay()
                 )
         );
+
+        day.setEnabled(
+                !calendarDay.isOverflowDay()
+        );
+
+        if (calendarDay.isToday()) {
+            day.setBackgroundResource(
+                    R.drawable.bg_today_calendar_day
+            );
+        } else {
+            day.setBackgroundResource(
+                    R.drawable.bg_calendar_day
+            );
+        }
     }
 
     private void updateHighlight() {
         Resources res = itemView.getResources();
         boolean isOverflow = calendarDay.isOverflowDay();
-        if (isOverflow) {
-            itemView.setSelected(false);
-            day.setTextColor(
-                    res.getColor(android.R.color.tertiary_text_light)
-            );
-            return;
-        }
+        boolean isHighlighted = calendarDay.isHighlighted() && !isOverflow;
+        itemView.setSelected(isHighlighted);
 
-        if (calendarDay.isHighlighted()) {
-            itemView.setSelected(true);
+        if (calendarDay.isHighlighted() || calendarDay.isToday()) {
             day.setTextColor(
                     res.getColor(android.R.color.primary_text_dark)
             );
         } else {
-            itemView.setSelected(false);
             day.setTextColor(
                     res.getColor(android.R.color.primary_text_light)
             );

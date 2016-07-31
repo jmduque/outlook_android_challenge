@@ -69,6 +69,7 @@ public class MainActivity
     private AgendaAdapter agendaAdapter;
     private List<AgendaItem> agendaItems = new ArrayList<>();
     private HashMap<String, AgendaItem> agendaHeaders = new HashMap<>();
+    private AgendaHeader firstVisibleAgendaHeader;
 
     //CALENDAR VIEWS & DATA
     private RecyclerView calendar;
@@ -399,26 +400,27 @@ public class MainActivity
      */
     private void setListeners() {
         agenda.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            private AgendaHeader firstVisibleAgendaHeader;
-
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int firstCompletelyVisibleItemPosition =
-                        agendaLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
-                AgendaItem agendaItem = agendaItems.get(firstCompletelyVisibleItemPosition);
-                if (agendaItem instanceof AgendaHeader) {
-                    if (firstVisibleAgendaHeader == agendaItem) {
-                        return;
-                    }
-
-                    firstVisibleAgendaHeader = (AgendaHeader) agendaItem;
-                    onNewHeaderDate(agendaItem.getDate());
-                }
+                checkFirstVisibleHeader();
             }
         });
         fab.setOnClickListener(this);
+    }
+
+    private void checkFirstVisibleHeader() {
+        int firstCompletelyVisibleItemPosition =
+                agendaLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
+        AgendaItem agendaItem = agendaItems.get(firstCompletelyVisibleItemPosition);
+        if (agendaItem instanceof AgendaHeader) {
+            if (firstVisibleAgendaHeader == agendaItem) {
+                return;
+            }
+
+            firstVisibleAgendaHeader = (AgendaHeader) agendaItem;
+            onNewHeaderDate(agendaItem.getDate());
+        }
     }
 
     @Override
@@ -466,10 +468,10 @@ public class MainActivity
 
     @Override
     public void onDayPressed(CalendarDay pressedDay) {
-        setHighlightedDay(pressedDay);
         scrollAgendaToDate(
                 pressedDay.getDate()
         );
+        checkFirstVisibleHeader();
     }
 
     public void scrollAgendaToDate(Date date) {

@@ -44,7 +44,6 @@ public class AgendaAdapter
         this.context = context;
         layoutInflater = LayoutInflater.from(this.context);
         this.items = items;
-        setHasStableIds(true);
     }
 
     public AgendaItem getItem(int position) {

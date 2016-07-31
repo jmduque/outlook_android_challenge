@@ -62,6 +62,7 @@ public class CalendarMonthController {
                             Calendar.DAY_OF_MONTH
                     )
             );
+
             //We consider overflow days those not within the first and last day of month
             calendarDay.setOverflowDay(
                     !DateTimeUtils.isDateWithinDates(
@@ -70,6 +71,12 @@ public class CalendarMonthController {
                             lastDayOfMonth
                     )
             );
+
+            //Today is a special day :)
+            calendarDay.setToday(
+                    DateUtils.isToday(date.getTime())
+            );
+
             daysList.add(calendarDay);
         }
 
