@@ -24,6 +24,6 @@ public abstract class BaseViewHolder
 
     protected abstract void setListeners();
 
-    protected abstract void updateView();
+    public abstract void updateView();
 
 }

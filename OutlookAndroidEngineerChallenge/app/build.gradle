@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
@@ -25,6 +29,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.dinuscxj:recycleritemdecoration:1.0.0'
+    compile 'com.github.lsjwzh.RecyclerViewPager:lib:v1.1.0'
     compile 'com.android.support:cardview-v7:24.1.1'
     androidTestCompile 'junit:junit:4.12'
 }

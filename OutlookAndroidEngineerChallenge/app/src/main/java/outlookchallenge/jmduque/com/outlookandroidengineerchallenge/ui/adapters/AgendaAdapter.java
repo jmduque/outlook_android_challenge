@@ -42,9 +42,8 @@ public class AgendaAdapter
     ) {
         super();
         this.context = context;
+        layoutInflater = LayoutInflater.from(this.context);
         this.items = items;
-
-        layoutInflater = LayoutInflater.from(context);
     }
 
     public AgendaItem getItem(int position) {
@@ -95,8 +94,7 @@ public class AgendaAdapter
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
                                 R.layout.item_agenda_header,
-                                parent,
-                                false
+                                null
                         )
                 );
             }
@@ -121,8 +119,7 @@ public class AgendaAdapter
             default: {
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
-                                R.layout.item_agenda_header,
-                                parent,
+                                R.layout.item_agenda_header, parent,
                                 false
                         )
                 );

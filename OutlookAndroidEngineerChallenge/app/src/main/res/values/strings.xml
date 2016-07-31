@@ -18,4 +18,17 @@
     <string name="oaec_agenda_event_duration">%1$dh</string>
     <string name="oaec_agenda_today_date">Today - %1$s</string>
     <string name="oaec_agenda_tomorrow_date">Tomorrow - %1$s</string>
+
+    <!-- Calendar View -->
+    <string name="oaec_calendar_monday">Mon</string>
+    <string name="oaec_calendar_tuesday">Tue</string>
+    <string name="oaec_calendar_wednesday">Wed</string>
+    <string name="oaec_calendar_thursday">Thu</string>
+    <string name="oaec_calendar_friday">Fri</string>
+    <string name="oaec_calendar_saturday">Sat</string>
+    <string name="oaec_calendar_sunday">Sun</string>
+    <string name="oaec_calendar_month_first_day">%1$04d-%2$02d-01</string>
+    <string name="oaec_calendar_day_of_the_month">%1$02d</string>
+    <string name="oaec_calendar_key_format">%1$04d-%2$02d</string>
+
 </resources>
