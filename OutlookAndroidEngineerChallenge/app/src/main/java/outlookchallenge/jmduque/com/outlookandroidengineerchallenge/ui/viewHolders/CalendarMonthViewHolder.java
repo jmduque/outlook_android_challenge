@@ -44,7 +44,7 @@ public class CalendarMonthViewHolder
 
     @Override
     protected void bindViews(View itemView) {
-        month = (RecyclerView) itemView.findViewById(R.id.month);
+        month = (RecyclerView) itemView.findViewById(R.id.tv_month);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class CalendarDayViewHolder
 
     @Override
     protected void bindViews(View itemView) {
-        day = (TextView) itemView.findViewById(R.id.day);
+        day = (TextView) itemView.findViewById(R.id.tv_day);
     }
 
     @Override

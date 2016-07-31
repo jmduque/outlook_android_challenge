@@ -7,7 +7,7 @@
     android:padding="@dimen/oaec_small_spacing">
 
     <TextView
-        android:id="@+id/day"
+        android:id="@+id/tv_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
