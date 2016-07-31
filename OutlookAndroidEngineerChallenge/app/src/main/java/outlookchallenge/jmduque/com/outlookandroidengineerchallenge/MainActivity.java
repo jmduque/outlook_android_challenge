@@ -338,6 +338,10 @@ public class MainActivity
         );
     }
 
+    /**
+     * To be invoked once a NewHeader has been detected. We consider a new header as an
+     * AgendaHeader on top of the list. Other AgendaHeaders will be ignored.
+     */
     private void onNewHeaderDate(Date date) {
         setHighlightedDay(
                 date
@@ -387,11 +391,17 @@ public class MainActivity
         fab.setOnClickListener(this);
     }
 
+    /**
+     * Checks which is the first view visible within the agenda.
+     * If first visible item is an AgendaHeader, we notify a new header has been created
+     */
     private void checkFirstVisibleHeader() {
         int firstCompletelyVisibleItemPosition =
                 agendaLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
         AgendaItem agendaItem = agendaItems.get(firstCompletelyVisibleItemPosition);
+        //We only take action if first visible item is an AgendaHeader
         if (agendaItem instanceof AgendaHeader) {
+            //If only take action if last-detected header is different from newly detected one
             if (firstVisibleAgendaHeader == agendaItem) {
                 return;
             }
@@ -468,7 +478,7 @@ public class MainActivity
                 expectedPosition
         );
 
-        //Make sure day's haader is first view
+        //Make sure day's header is first view
         agendaLinearLayoutManager.scrollToPosition(
                 headerPosition
         );
@@ -492,6 +502,12 @@ public class MainActivity
         checkFirstVisibleHeader();
     }
 
+    /**
+     * Scrolls the agenda to make an AgendaHeader that matches the provided date be the first view
+     * of the agenda.
+     *
+     * @param date expected date of the first visible item in the agenda
+     */
     public void scrollAgendaToDate(Date date) {
         String dayOfTheYear = DateTimeUtils.dayOfTheYear.format(date);
         AgendaItem agendaItem = agendaHeaders.get(dayOfTheYear);
@@ -503,6 +519,11 @@ public class MainActivity
         );
     }
 
+    /**
+     * Scrolls the calendar view to match with the provided date
+     *
+     * @param date to be contained within the month we want to scroll
+     */
     public void scrollCalendarToDate(Date date) {
         gregorianCalendar.setTime(date);
 
@@ -529,6 +550,10 @@ public class MainActivity
         );
     }
 
+    /**
+     * Set highlighted day by a provided date. It will use the date to find the appropriated
+     * CalendarMonth and the CalendarDay within the month.
+     */
     public void setHighlightedDay(Date date) {
         gregorianCalendar.setTime(date);
 
@@ -557,6 +582,10 @@ public class MainActivity
         );
     }
 
+    /**
+     * Updates the highlighted calendar day. Last known-highlighted one
+     * will be marked as non-highlighted
+     */
     public void setHighlightedDay(CalendarDay calendarDay) {
         calendarDay.setHighlighted(true);
 
