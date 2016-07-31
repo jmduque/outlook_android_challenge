@@ -107,9 +107,14 @@ public class CalendarDayViewHolder
         boolean isHighlighted = calendarDay.isHighlighted() && !isOverflow;
         itemView.setSelected(isHighlighted);
 
-        if (calendarDay.isHighlighted() || calendarDay.isToday()) {
+        if (isHighlighted || calendarDay.isToday()) {
             day.setTextColor(
                     res.getColor(android.R.color.primary_text_dark)
+            );
+        } else if (isOverflow) {
+            day.setTextColor(
+                    res.getColor(android.R.color.tertiary_text_light
+                    )
             );
         } else {
             day.setTextColor(

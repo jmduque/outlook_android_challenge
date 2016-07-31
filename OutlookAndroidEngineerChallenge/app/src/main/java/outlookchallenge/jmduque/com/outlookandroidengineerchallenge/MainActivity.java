@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.lsjwzh.widget.recyclerviewpager.RecyclerViewPager;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,6 +33,7 @@ import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.Calen
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.AgendaAdapter;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.CalendarAdapter;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
 
 /**
@@ -72,7 +75,7 @@ public class MainActivity
     private AgendaHeader firstVisibleAgendaHeader;
 
     //CALENDAR VIEWS & DATA
-    private RecyclerView calendar;
+    private RecyclerViewPager calendar;
     private CalendarAdapter calendarAdapter;
     private CalendarDay previousHighlightedDay;
     private List<CalendarMonth> calendarItems = new ArrayList<>();
@@ -252,7 +255,7 @@ public class MainActivity
 
     public int getFirstDayOfWeek(Date date) {
         gregorianCalendar.setTime(date);
-        return gregorianCalendar.get(Calendar.DAY_OF_WEEK);
+        return gregorianCalendar.get(Calendar.DAY_OF_WEEK) - 1;
     }
 
     private String calendarKeyFormatter(
@@ -325,7 +328,7 @@ public class MainActivity
      * This method generates and initializes the views for the calendar
      */
     private void initCalendarViews() {
-        calendar = (RecyclerView) findViewById(R.id.calendar);
+        calendar = (RecyclerViewPager) findViewById(R.id.calendar);
         calendar.setLayoutManager(
                 new LinearLayoutManager(
                         this,
@@ -406,6 +409,29 @@ public class MainActivity
                 checkFirstVisibleHeader();
             }
         });
+        calendar.addOnPageChangedListener(
+                new RecyclerViewPager.OnPageChangedListener() {
+                    @Override
+                    public void OnPageChanged(
+                            int previousPosition,
+                            int newPosition
+                    ) {
+                        if (!CollectionUtils.isValidPosition(
+                                calendarItems,
+                                newPosition
+                        )) {
+                            return;
+                        }
+
+                        CalendarMonth item = calendarItems.get(newPosition);
+                        if (item == null) {
+                            return;
+                        }
+
+                        setTitle(item.getMonthName());
+                    }
+                }
+        );
         fab.setOnClickListener(this);
     }
 
@@ -477,10 +503,11 @@ public class MainActivity
     public void scrollAgendaToDate(Date date) {
         String dayOfTheYear = DateTimeUtils.dayOfTheYear.format(date);
         AgendaItem agendaItem = agendaHeaders.get(dayOfTheYear);
-        agenda.scrollToPosition(
+        agendaLinearLayoutManager.scrollToPositionWithOffset(
                 agendaItems.indexOf(
                         agendaItem
-                )
+                ),
+                0
         );
     }
 
@@ -502,10 +529,6 @@ public class MainActivity
         if (calendarMonth == null) {
             return;
         }
-
-        setTitle(
-                calendarMonth.getMonthName()
-        );
 
         calendar.scrollToPosition(
                 calendarItems.indexOf(
