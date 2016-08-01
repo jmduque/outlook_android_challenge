@@ -31,5 +31,6 @@ dependencies {
     compile 'com.dinuscxj:recycleritemdecoration:1.0.0'
     compile 'com.github.lsjwzh.RecyclerViewPager:lib:v1.1.0'
     compile 'com.android.support:cardview-v7:24.1.1'
+    compile 'com.github.johnhiott:DarkSkyApi:v0.1.4'
     androidTestCompile 'junit:junit:4.12'
 }

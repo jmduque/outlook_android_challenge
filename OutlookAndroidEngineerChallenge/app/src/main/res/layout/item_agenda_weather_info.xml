@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:toos="http://schemas.android.com/tools"
+    style="@style/oaec_agenda_cell">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_degree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:drawablePadding="@dimen/oaec_small_spacing"
+            android:maxLines="1"
+            android:textAllCaps="true"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textSize="@dimen/oaec_tertiary_text_size"
+            toos:text="31~" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/tv_degree"
+            android:layout_toStartOf="@id/tv_degree"
+            android:maxLines="1"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="@color/agenda_weather_name"
+            android:textSize="@dimen/oaec_tertiary_text_size"
+            toos:text="Morning" />
+
+    </RelativeLayout>
+
+</FrameLayout>

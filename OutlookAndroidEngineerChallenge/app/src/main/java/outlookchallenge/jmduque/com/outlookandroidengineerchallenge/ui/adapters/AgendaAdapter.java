@@ -12,10 +12,12 @@ import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.Agend
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaHeader;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaItem;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaNoEvent;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaWeatherInfo;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaEventViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaHeaderViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaItemViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaNoEventViewHolder;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.viewHolders.AgendaWeatherInfoViewHolder;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 
 /**
@@ -28,6 +30,7 @@ public class AgendaAdapter
     public static final int HEADER = 0;
     public static final int EVENT = 1;
     public static final int NO_EVENT = 2;
+    public static final int WEATHER_INFO = 3;
 
     public static final int DEFAULT_VIEW_TYPE = HEADER;
 
@@ -79,6 +82,8 @@ public class AgendaAdapter
             return NO_EVENT;
         } else if (item instanceof AgendaEvent) {
             return EVENT;
+        } else if (item instanceof AgendaWeatherInfo) {
+            return WEATHER_INFO;
         }
 
         return DEFAULT_VIEW_TYPE;
@@ -94,7 +99,8 @@ public class AgendaAdapter
                 return new AgendaHeaderViewHolder(
                         layoutInflater.inflate(
                                 R.layout.item_agenda_header,
-                                null
+                                parent,
+                                false
                         )
                 );
             }
@@ -111,6 +117,15 @@ public class AgendaAdapter
                 return new AgendaEventViewHolder(
                         layoutInflater.inflate(
                                 R.layout.item_agenda_event,
+                                parent,
+                                false
+                        )
+                );
+            }
+            case WEATHER_INFO: {
+                return new AgendaWeatherInfoViewHolder(
+                        layoutInflater.inflate(
+                                R.layout.item_agenda_weather_info,
                                 parent,
                                 false
                         )
