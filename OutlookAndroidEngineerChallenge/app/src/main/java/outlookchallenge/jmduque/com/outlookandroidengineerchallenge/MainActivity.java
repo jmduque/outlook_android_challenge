@@ -1,8 +1,17 @@
 package outlookchallenge.jmduque.com.outlookandroidengineerchallenge;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +27,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.johnhiott.darkskyandroidlib.ForecastApi;
+import com.johnhiott.darkskyandroidlib.RequestBuilder;
+import com.johnhiott.darkskyandroidlib.models.DataBlock;
+import com.johnhiott.darkskyandroidlib.models.DataPoint;
+import com.johnhiott.darkskyandroidlib.models.Request;
+import com.johnhiott.darkskyandroidlib.models.WeatherResponse;
 import com.lsjwzh.widget.recyclerviewpager.RecyclerViewPager;
 
 import java.util.ArrayList;
@@ -29,17 +44,22 @@ import java.util.List;
 import java.util.Random;
 
 import app.dinus.com.itemdecoration.PinnedHeaderDecoration;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.controller.AgendaWeatherInfoController;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.controller.CalendarMonthController;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaEvent;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaHeader;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaItem;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaNoEvent;
+import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.AgendaWeatherInfo;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarDay;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.models.CalendarMonth;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.AgendaAdapter;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.ui.adapters.CalendarAdapter;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.CollectionUtils;
 import outlookchallenge.jmduque.com.outlookandroidengineerchallenge.utils.DateTimeUtils;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * @author Jose Duque
@@ -50,7 +70,8 @@ public class MainActivity
         AppCompatActivity
         implements
         View.OnClickListener,
-        CalendarDay.DaySelector {
+        CalendarDay.DaySelector,
+        Callback<WeatherResponse> {
 
     private static final String[] randomEventNames = {
             "China Joy",
@@ -69,7 +90,11 @@ public class MainActivity
             "Barcelona"
     };
 
+    private static final int REQUEST_LOCATION_PERMISSION = 0;
+
     private final Calendar gregorianCalendar = new GregorianCalendar();
+
+    private View clParent;
 
     //AGENDA VIEWS & DATA
     private RecyclerView agenda;
@@ -96,13 +121,19 @@ public class MainActivity
     private FloatingActionButton fab;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(
+            Bundle savedInstanceState
+    ) {
         super.onCreate(savedInstanceState);
+        ForecastApi.create("893949a9f8918d134755c749b3bd0ee8");
+
         setTitle(null);
         initAgendaDemoData();
         initCalendarDemoData();
         bindViews();
         setListeners();
+
+        requestLastKnownLocation();
     }
 
     /**
@@ -269,18 +300,27 @@ public class MainActivity
      * Finds the views within the activity and binds them to local properties
      */
     private void bindViews() {
+        //Init activity's main layout
         setContentView(R.layout.activity_main);
+
+        //Find root coordinator layout
+        clParent = findViewById(R.id.cl_parent);
+
+        //Init toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Init calendar & agenda related views
         initCalendarViews();
         initAgendaViews();
         initMonthPickerViews();
 
+        //Scroll to today's date
         scrollAgendaToDate(
                 new Date()
         );
 
+        //Init add button
         fab = (FloatingActionButton) findViewById(R.id.fab);
     }
 
@@ -406,13 +446,23 @@ public class MainActivity
      * Setups the listeners for the views within the activity
      */
     private void setListeners() {
-        agenda.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkFirstVisibleHeader();
-            }
-        });
+        agenda.setOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(
+                            RecyclerView recyclerView,
+                            int dx,
+                            int dy
+                    ) {
+                        super.onScrolled(
+                                recyclerView,
+                                dx,
+                                dy
+                        );
+                        checkFirstVisibleHeader();
+                    }
+                }
+        );
         calendar.addOnPageChangedListener(
                 new RecyclerViewPager.OnPageChangedListener() {
                     @Override
@@ -432,7 +482,9 @@ public class MainActivity
                             return;
                         }
 
-                        monthPickerName.setText(item.getMonthName());
+                        monthPickerName.setText(
+                                item.getMonthName()
+                        );
                     }
                 }
         );
@@ -445,9 +497,11 @@ public class MainActivity
      * If first visible item is an AgendaHeader, we notify a new header has been created
      */
     private void checkFirstVisibleHeader() {
-        int firstCompletelyVisibleItemPosition =
-                agendaLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
-        AgendaItem agendaItem = agendaItems.get(firstCompletelyVisibleItemPosition);
+        int firstCompletelyVisibleItemPosition = agendaLinearLayoutManager
+                .findFirstCompletelyVisibleItemPosition();
+        AgendaItem agendaItem = agendaItems
+                .get(firstCompletelyVisibleItemPosition);
+
         //We only take action if first visible item is an AgendaHeader
         if (agendaItem instanceof AgendaHeader) {
             //If only take action if last-detected header is different from newly detected one
@@ -456,19 +510,29 @@ public class MainActivity
             }
 
             firstVisibleAgendaHeader = (AgendaHeader) agendaItem;
-            onNewHeaderDate(agendaItem.getDate());
+            onNewHeaderDate(
+                    agendaItem.getDate()
+            );
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(
+            Menu menu
+    ) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater()
+                .inflate(
+                        R.menu.menu_main,
+                        menu
+                );
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(
+            MenuItem item
+    ) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -482,7 +546,9 @@ public class MainActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void handleFabClick(View view) {
+    private void handleFabClick(
+            @Nullable View view
+    ) {
         if (firstVisibleAgendaHeader == null) {
             return;
         }
@@ -538,7 +604,9 @@ public class MainActivity
      *
      * @param view the clicked one
      */
-    private void handleMonthPickerClick(View view) {
+    private void handleMonthPickerClick(
+            @Nullable View view
+    ) {
         if (calendar.getVisibility() == View.VISIBLE) {
             hideCalendar();
         } else {
@@ -557,24 +625,32 @@ public class MainActivity
                 R.anim.half_rotation
         );
 
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        animation.setAnimationListener(
+                new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(
+                            Animation animation
+                    ) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                monthPickerArrow.setImageResource(
-                        R.drawable.ic_expand_more_white_24dp
-                );
-            }
+                    @Override
+                    public void onAnimationEnd(
+                            Animation animation
+                    ) {
+                        monthPickerArrow.setImageResource(
+                                R.drawable.ic_expand_more_white_24dp
+                        );
+                    }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(
+                            Animation animation
+                    ) {
 
-            }
-        });
+                    }
+                }
+        );
 
         monthPickerArrow.startAnimation(
                 animation
@@ -598,24 +674,32 @@ public class MainActivity
                 R.anim.half_rotation
         );
 
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        animation.setAnimationListener(
+                new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(
+                            Animation animation
+                    ) {
 
-            }
+                    }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                monthPickerArrow.setImageResource(
-                        R.drawable.ic_expand_less_white_24dp
-                );
-            }
+                    @Override
+                    public void onAnimationEnd(
+                            Animation animation
+                    ) {
+                        monthPickerArrow.setImageResource(
+                                R.drawable.ic_expand_less_white_24dp
+                        );
+                    }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                    @Override
+                    public void onAnimationRepeat(
+                            Animation animation
+                    ) {
 
-            }
-        });
+                    }
+                }
+        );
 
         monthPickerArrow.startAnimation(
                 animation
@@ -623,7 +707,9 @@ public class MainActivity
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(
+            View view
+    ) {
         switch (view.getId()) {
             case R.id.fab: {
                 handleFabClick(view);
@@ -637,7 +723,9 @@ public class MainActivity
     }
 
     @Override
-    public void onDayPressed(CalendarDay pressedDay) {
+    public void onDayPressed(
+            CalendarDay pressedDay
+    ) {
         scrollAgendaToDate(
                 pressedDay.getDate()
         );
@@ -650,7 +738,9 @@ public class MainActivity
      *
      * @param date expected date of the first visible item in the agenda
      */
-    public void scrollAgendaToDate(Date date) {
+    public void scrollAgendaToDate(
+            Date date
+    ) {
         String dayOfTheYear = DateTimeUtils.dayOfTheYear.format(date);
         AgendaItem agendaItem = agendaHeaders.get(dayOfTheYear);
         agendaLinearLayoutManager.scrollToPositionWithOffset(
@@ -666,7 +756,9 @@ public class MainActivity
      *
      * @param date to be contained within the month we want to scroll
      */
-    public void scrollCalendarToDate(Date date) {
+    public void scrollCalendarToDate(
+            Date date
+    ) {
         gregorianCalendar.setTime(date);
 
         int year = gregorianCalendar.get(Calendar.YEAR);
@@ -696,7 +788,9 @@ public class MainActivity
      * Set highlighted day by a provided date. It will use the date to find the appropriated
      * CalendarMonth and the CalendarDay within the month.
      */
-    public void setHighlightedDay(Date date) {
+    public void setHighlightedDay(
+            Date date
+    ) {
         gregorianCalendar.setTime(date);
 
         int year = DateTimeUtils.getYear(date);
@@ -728,7 +822,9 @@ public class MainActivity
      * Updates the highlighted calendar day. Last known-highlighted one
      * will be marked as non-highlighted
      */
-    public void setHighlightedDay(CalendarDay calendarDay) {
+    public void setHighlightedDay(
+            CalendarDay calendarDay
+    ) {
         calendarDay.setHighlighted(true);
 
         if (previousHighlightedDay != null) {
@@ -738,4 +834,301 @@ public class MainActivity
         previousHighlightedDay = calendarDay;
     }
 
+    /**
+     * Check if permission for location has been granted. Both COARSE and FINE location
+     * are requested
+     *
+     * @param permissionRequest will be used as a request code in case of user granting permission
+     */
+    private boolean mayAccessLocation(final int permissionRequest) {
+        //Only needed after Android 6.0
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+
+        //Check if permission has been granted already
+        int coarseLocationSelfPermission = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        );
+        if (coarseLocationSelfPermission != PackageManager.PERMISSION_GRANTED) {
+            //Request permission from user
+            requestCoarseLocation(permissionRequest);
+            return false;
+        }
+
+        int fineLocationSelfPermission = ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        );
+        if (fineLocationSelfPermission != PackageManager.PERMISSION_GRANTED) {
+            //Request permission from user
+            requestFineLocation(permissionRequest);
+            return false;
+        }
+
+        //If all location permissions available, return true
+        return true;
+    }
+
+    /**
+     * Request permission to the user/system to use coarse location
+     *
+     * @param permissionRequest tracker for the request
+     */
+    private void requestCoarseLocation(final int permissionRequest) {
+        //Only needed after Android 6.0
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+
+        //Check if should ask permission to the user
+        if (shouldShowRequestPermissionRationale(
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        )) {
+            Snackbar.make(
+                    clParent,
+                    R.string.oaec_main_allow_location_access,
+                    Snackbar.LENGTH_INDEFINITE
+            ).setAction(
+                    android.R.string.ok,
+                    new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(
+                                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    permissionRequest
+                            );
+                        }
+                    }
+            );
+        } else {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    permissionRequest
+            );
+        }
+    }
+
+    /**
+     * Request permission to the user/system to use coarse location
+     *
+     * @param permissionRequest tracker for the request
+     */
+    private void requestFineLocation(final int permissionRequest) {
+        //Only needed after Android 6.0
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+
+        //Check if should ask permission to the user
+        if (shouldShowRequestPermissionRationale(
+                Manifest.permission.ACCESS_FINE_LOCATION
+        )) {
+            Snackbar.make(
+                    clParent,
+                    R.string.oaec_main_allow_location_access,
+                    Snackbar.LENGTH_INDEFINITE
+            ).setAction(
+                    android.R.string.ok,
+                    new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    permissionRequest
+                            );
+                        }
+                    }
+            );
+        } else {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    permissionRequest
+            );
+        }
+    }
+
+    /**
+     * Uses google services to request the latest known position of the user.
+     * If user has no ACCESS_COARSE_LOCATION permission granted (and didn't deny it before),
+     * it will ask the user for it.
+     * Once latest known non-null location has ben retrieved, we will try to get weather data
+     */
+    private void requestLastKnownLocation() {
+        //Can't request location if user didn't grant location permissions
+        if (!mayAccessLocation(REQUEST_LOCATION_PERMISSION)) {
+            return;
+        }
+
+        LocationManager locationManager =
+                (LocationManager) getSystemService(
+                        Context.LOCATION_SERVICE
+                );
+
+        try {
+            Location lastKnownLocation = locationManager.getLastKnownLocation(
+                    LocationManager.NETWORK_PROVIDER
+            );
+            onLocationChanged(lastKnownLocation);
+        } catch (SecurityException ignored) {
+            //Permission check happens within the mayAccessLocation method,
+            //but we still need an exception catcher to avoid lint-errors
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            String[] permissions,
+            int[] grantResults
+    ) {
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSION: {
+                if (grantResults.length == 1 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    requestLastKnownLocation();
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void success(
+            WeatherResponse weatherResponse,
+            Response response
+    ) {
+        DataBlock dailyData = weatherResponse.getHourly();
+        List<DataPoint> nextTwoDays = dailyData.getData();
+        //We will use the weather as follows:
+        // 10:00 -> Morning
+        // 14:00 -> Afternoon
+        // 18:00 -> Night
+        for (int i = 0; i < CollectionUtils.size(nextTwoDays); i++) {
+            DataPoint dataPoint = nextTwoDays.get(i);
+            //Creates the object, if not to be visualized, we will get a null object
+            AgendaWeatherInfo item = AgendaWeatherInfoController.parseDataPoint(
+                    this,
+                    dataPoint
+            );
+            //Add item to agenda
+            addAgendaWeatherInfoToAgenda(item);
+        }
+    }
+
+    /**
+     * Adds an <class>AgendaWeatherInfo</class> to the expected position in the list of agenda
+     * items. Notice that the expectation is that this method will be called for morning,
+     * then afternoon, then evening ones.
+     *
+     * @param item the weather information to be added to agenda
+     */
+    private void addAgendaWeatherInfoToAgenda(
+            AgendaWeatherInfo item
+    ) {
+        if (item == null) {
+            return;
+        }
+        String dayOfTheYear = DateTimeUtils
+                .dayOfTheYear
+                .format(
+                        item.getDate()
+                );
+
+        AgendaHeader agendaHeader = (AgendaHeader) agendaHeaders.get(
+                dayOfTheYear
+        );
+        int position = agendaItems.indexOf(agendaHeader);
+        int addPosition = position + 1;
+        AgendaItem nextItem;
+        do {
+            nextItem = agendaItems.get(addPosition);
+            if (nextItem instanceof AgendaNoEvent) {
+                //If this had no events, remove the no events holder
+                agendaItems.remove(addPosition);
+                agendaAdapter.notifyItemRemoved(addPosition);
+            } else if (nextItem instanceof AgendaHeader) {
+                //If found next header, we use next header position to place the weather info
+                //We are gonna place all weather events at the bottom of views related to the
+                //weather info dates
+                break;
+            } else {
+                //Keep searching
+                addPosition++;
+            }
+        } while (true);
+        agendaItems.add(
+                addPosition,
+                item
+        );
+        agendaAdapter.notifyItemInserted(addPosition);
+    }
+
+    @Override
+    public void failure(
+            RetrofitError error
+    ) {
+
+    }
+
+    /**
+     * Handles the success of retrieving the user's last known location and requests weather data
+     * according to user's location
+     *
+     * @param location current GeoLocation of the user
+     */
+    public void onLocationChanged(
+            Location location
+    ) {
+        //Can't do anything if user doesn't have location yet
+        if (location == null) {
+            return;
+        }
+
+        RequestBuilder requestBuilder = new RequestBuilder();
+        Request request = new Request();
+        request.setLat(
+                String.valueOf(
+                        location.getLatitude()
+                )
+        );
+        request.setLng(
+                String.valueOf(
+                        location.getLongitude()
+                )
+        );
+        //I like the international metric system :D
+        request.setUnits(
+                Request.Units.SI
+        );
+        request.setLanguage(
+                Request.Language.ENGLISH
+        );
+        //We only need the data hourly since we need to display
+        //morning, afternoon and night weather
+        request.addExcludeBlock(
+                Request.Block.DAILY
+        );
+        request.addExcludeBlock(
+                Request.Block.MINUTELY
+        );
+        request.addExcludeBlock(
+                Request.Block.ALERTS
+        );
+        request.addExcludeBlock(
+                Request.Block.CURRENTLY
+        );
+        request.addExcludeBlock(
+                Request.Block.FLAGS
+        );
+        requestBuilder.getWeather(
+                request,
+                this
+        );
+    }
 }

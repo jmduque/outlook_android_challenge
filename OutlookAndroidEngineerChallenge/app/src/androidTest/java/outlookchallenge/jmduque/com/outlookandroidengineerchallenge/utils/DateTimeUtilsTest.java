@@ -308,6 +308,16 @@ public class DateTimeUtilsTest
     }
 
     @Test
+    public void testGetHourOfTheDay() throws Exception {
+        Date date = new Date(946735871001L);
+        assertEquals(
+                "Unexpected Hour Value",
+                22,
+                DateTimeUtils.getHourOfTheDay(date)
+        );
+    }
+
+    @Test
     public void testGetFirstDayOfWeek() throws Exception {
         Date date = dayOfTheYear.parse("1999-11-22");
         assertEquals(

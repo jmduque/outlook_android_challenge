@@ -8,6 +8,7 @@
     <color name="agenda_icon">#B1355F</color>
     <color name="agenda_header_today_background">#F4F9FD</color>
     <color name="agenda_header_other_day_background">@android:color/white</color>
+    <color name="agenda_weather_name">#F9061D</color>
 
     //CALENDAR VIEW
     <color name="calendar_today_background">#C8E5F7</color>

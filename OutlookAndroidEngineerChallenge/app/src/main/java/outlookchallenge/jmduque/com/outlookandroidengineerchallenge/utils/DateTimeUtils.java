@@ -212,6 +212,14 @@ public class DateTimeUtils {
     }
 
     /**
+     * @return hour of the day, i.e., 10:32 PM returns 22
+     */
+    public static int getHourOfTheDay(Date date) {
+        gregorianCalendar.setTime(date);
+        return gregorianCalendar.get(Calendar.HOUR_OF_DAY);
+    }
+
+    /**
      * @return 0-based day of the week (Sunday == 0)
      */
     public static int getFirstDayOfWeek(Date date) {
