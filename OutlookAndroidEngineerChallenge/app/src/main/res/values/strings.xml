@@ -4,6 +4,7 @@
     <!-- Main Activity -->
     <string name="oaec_main_title">Main</string>
     <string name="oaec_main_allow_location_access">Do you allow app to access location?</string>
+    <string name="oaec_main_random_event_created">Created Random Agenda Event on Current Date</string>
 
     <!-- Main Activity Menus -->
     <string name="oaec_action_set_view">Set View</string>

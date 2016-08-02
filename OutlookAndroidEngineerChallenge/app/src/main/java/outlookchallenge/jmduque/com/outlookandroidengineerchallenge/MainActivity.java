@@ -554,8 +554,8 @@ public class MainActivity
         }
 
         Snackbar.make(
-                view,
-                "Created Random Agenda Event on Current Date",
+                clParent,
+                R.string.oaec_main_random_event_created,
                 Snackbar.LENGTH_LONG
         ).setAction(
                 android.R.string.ok,
